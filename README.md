@@ -10,7 +10,8 @@ This repository provides original technical explanations, production code implem
 
 ```text
 data-engineering-interview-handbook/
-├── playbooks/                        # Core Interview Defense Playbooks (125 Essential Questions)
+├── playbooks/                        # Core Interview Defense Playbooks
+│   ├── 100_spark_data_issues_problems_and_answers.md # 100 Real-World Spark/PySpark/SQL Data Issues
 │   ├── 01_sql_and_pyspark_125.md     # SQL & PySpark internals, Catalyst, Tungsten, GC triage
 │   ├── 02_kafka_and_streaming_125.md # Apache Kafka, EOS, and Spark Structured Streaming
 │   ├── 03_azure_databricks_125.md    # Delta Lake 3.x, Liquid Clustering, Unity Catalog
