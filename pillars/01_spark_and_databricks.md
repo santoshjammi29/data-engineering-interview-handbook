@@ -7,7 +7,6 @@
 
 **Difficulty:** `HARD` | **Niche:** `Catalyst Optimizer Internals`
 
-**Direct 30-Second Answer:**
 Spark translates DataFrame/SQL operations through 5 discrete Catalyst phases before submitting tasks to the cluster:
 1. **Unresolved Logical Plan:** Represents query syntax as an Abstract Syntax Tree (AST) where table/column names are unverified.
 2. **Resolved Logical Plan (Analysis):** Spark Catalog resolves column names, data types, and table existence from the metastore.
@@ -21,7 +20,6 @@ Spark translates DataFrame/SQL operations through 5 discrete Catalyst phases bef
 
 **Difficulty:** `ARCHITECT` | **Niche:** `Tungsten Engine & Memory Layout`
 
-**Direct 30-Second Answer:**
 Tungsten eliminates JVM overhead through 3 architectural pillars:
 1. **Off-Heap Binary Memory (`sun.misc.Unsafe`):** Stores Spark rows in compact 8-byte aligned raw binary memory rather than Java objects. A 4-byte Java string overhead is reduced from ~48 bytes on the JVM heap down to 4 bytes in Tungsten.
 2. **Zero JVM Garbage Collection:** Because Tungsten memory is allocated off-heap outside the JVM garbage-collected space, massive 100GB+ shuffles avoid JVM GC pauses.
@@ -33,7 +31,6 @@ Tungsten eliminates JVM overhead through 3 architectural pillars:
 
 **Difficulty:** `HARD` | **Niche:** `Shuffle Architecture & Sizing`
 
-**Direct 30-Second Answer:**
 Target **100 MB to 200 MB per partition** in memory to maximize throughput while avoiding spill:
 $$\text{Partitions} = \frac{\text{Total Stage Shuffle Size (500 GB)}}{128\text{ MB Target}} \approx 4000\text{ partitions}$$
 **Core Alignment Check:** Total partitions must be an integer multiple ($2\times \text{ to } 4\times$) of total available executor CPU cores to ensure balanced worker task scheduling.
@@ -51,7 +48,6 @@ AQE dynamically merges small post-shuffle partitions down to the 128MB advisory 
 
 **Difficulty:** `HARD` | **Niche:** `Query Optimization & Pruning`
 
-**Direct 30-Second Answer:**
 Static Partition Pruning works when filters are applied directly to the partitioned table (e.g. `WHERE date = '2026-11-18'`). In star schemas, filters are typically applied to dimension tables (e.g. `dim_date.quarter = 'Q4'`).
 **How DPP Works:**
 1. Spark executes a broadcast filter on the small filtered dimension table.
@@ -108,7 +104,6 @@ df_joined = df_large_salted.join(df_dim_replicated, on='salted_key', how='inner'
 
 **Difficulty:** `HARD` | **Niche:** `Vectorized Processing & Arrow`
 
-**Direct 30-Second Answer:**
 - **Standard Python UDF:** Operates row-by-row. Every row must be converted from Java objects, serialized into a byte stream, sent over an IPC socket pipe to a Python worker process, deserialized into Python objects, processed, and serialized back to the JVM. Causes massive serialization CPU waste.
 - **Vectorized Pandas UDF (PyArrow):** Batches data into **Apache Arrow columnar memory buffers**. Data is passed directly between JVM and Python worker via shared memory or C-pipes with zero deserialization overhead. The Python worker executes vectorized C/NumPy SIMD operations over entire columns at once, achieving a **$10\times \text{ to } 50\times$ speedup**.
 
@@ -118,7 +113,6 @@ df_joined = df_large_salted.join(df_dim_replicated, on='salted_key', how='inner'
 
 **Difficulty:** `MEDIUM` | **Niche:** `Caching & Memory Hygiene`
 
-**Direct 30-Second Answer:**
 - `cache()` is simply an alias for `persist(StorageLevel.MEMORY_AND_DISK)` (deserialized in memory).
 - `StorageLevel.MEMORY_AND_DISK_SER` stores data in memory as serialized byte arrays (one byte array per partition).
 **Why use `_SER` in Production:**
@@ -132,7 +126,6 @@ df_joined = df_large_salted.join(df_dim_replicated, on='salted_key', how='inner'
 
 **Difficulty:** `HARD` | **Niche:** `Distributed Variables & Network`
 
-**Direct 30-Second Answer:**
 Without broadcast variables, if a task references a local lookup dictionary, Spark serializes the dictionary and ships a separate copy across the network for **every single task** (e.g. 5,000 tasks = 5,000 network transfers).
 **With `sc.broadcast(data)`:**
 1. The driver serializes the object once and stores it in its local BlockManager.
@@ -145,12 +138,92 @@ Without broadcast variables, if a task references a local lookup dictionary, Spa
 
 **Difficulty:** `ARCHITECT` | **Niche:** `Memory Triage & Runbooks`
 
-**Direct 30-Second Answer:**
 - **Executor Heap OOM (`java.lang.OutOfMemoryError: Java heap space`):**
   - *Root Cause:* On-heap execution or user memory exhausted. Caused by massive join hash tables, skewed partitions, or caching huge DataFrames.
   - *Remediation:* Increase `spark.executor.memory`, increase shuffle partitions, or resolve data skew.
 - **Off-Heap OOM (Exit Code 137 / SIGKILL by YARN or Kubernetes):**
   - *Root Cause:* Total physical RAM consumed by the container (JVM Heap + Off-Heap + Python Daemons + OS buffers) exceeded the container limit set by the cluster manager.
   - *Remediation:* Increase `spark.executor.memoryOverhead` from 10% to 20-30% (`spark.executor.memoryOverhead = 2048MB`), especially when using PyArrow or heavy C-libraries.
+
+---
+
+### Q11: How do you author, inject, and test custom Catalyst optimization rules in Apache Spark?
+
+**Difficulty:** `ARCHITECT` | **Niche:** `Catalyst Optimizer Internals`
+
+Custom Catalyst rules extend `Rule[LogicalPlan]` and implement pattern matching on TreeNode trees using partial functions.
+```scala
+import org.apache.spark.sql.catalyst.plans.logical._
+import org.apache.spark.sql.catalyst.rules.Rule
+
+case class EnforceStorageTierFilter(tier: String) extends Rule[LogicalPlan] {
+  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+    case scan @ LogicalRelation(relation, _, _, _) =>
+      Filter(EqualTo(UnresolvedAttribute("tier"), Literal(tier)), scan)
+  }
+}
+// Registering into SparkSessionExtensions:
+spark.experimental.extraOptimizations = Seq(EnforceStorageTierFilter("HOT"))
+```
+**Injection Points:** Via `SparkSessionExtensions.injectOptimizerRule` or `injectResolutionRule`. Always ensure idempotency: applying a rule multiple times (`rule(rule(plan))`) must produce an identical tree to prevent infinite loops in the fixed-point rule executor.
+
+---
+
+### Q12: Explain the difference between Spill (Memory) and Spill (Disk) in Spark UI and how Tungsten UnsafeExternalSorter handles them.
+
+**Difficulty:** `HARD` | **Niche:** `Tungsten Engine & Memory Layout`
+
+**Spill (Memory):** The uncompressed size of data in JVM/off-heap Tungsten execution memory prior to serialization.
+**Spill (Disk):** The compressed physical byte size written to local NVMe/SSD scratch space (`/local_disk0`). Typically 2x to 5x smaller due to Snappy/LZ4 compression.
+**Mechanism:** When Tungsten's `UnsafeExternalSorter` exhausts its allocated memory block (`spark.memory.fraction * 0.5`), it sorts in-memory 8-byte pointer records and spills contiguous runs to disk. During the final merge phase, an external K-way merge sorter combines spilled files.
+**Remediation:** Increase `spark.sql.shuffle.partitions`, tune `spark.sql.adaptive.advisoryPartitionSizeInBytes` to 128MB, or increase executor memory fraction.
+
+---
+
+### Q13: How does Adaptive Query Execution (AQE) dynamically coalesce post-shuffle partitions at runtime?
+
+**Difficulty:** `HARD` | **Niche:** `Shuffle Architecture & Sizing`
+
+Traditionally, `spark.sql.shuffle.partitions` (default 200) was fixed regardless of dataset size, causing either small-file I/O thrashing or out-of-memory spill.
+**AQE Runtime Coalescing:**
+1. At stage boundaries, shuffle write tasks output MapStatus statistics detailing exact byte sizes of each shuffle partition.
+2. The driver collects statistics and applies `CoalesceShufflePartitions` rule.
+3. Consecutive shuffle partitions whose combined size is less than `spark.sql.adaptive.advisoryPartitionSizeInBytes` (default 64MB-128MB) are merged into a single reader task.
+```python
+spark.conf.set("spark.sql.adaptive.enabled", "true")
+spark.conf.set("spark.sql.adaptive.coalescePartitions.enabled", "true")
+spark.conf.set("spark.sql.adaptive.advisoryPartitionSizeInBytes", "134217728") # 128MB target
+```
+This eliminates manual tuning and prevents the creation of thousands of tiny output files.
+
+---
+
+### Q14: Why is the off-heap RocksDB StateStore mandatory for production 24/7 stateful Structured Streaming?
+
+**Difficulty:** `ARCHITECT` | **Niche:** `Query Optimization & Pruning`
+
+The default `HDFSBackedStateStoreProvider` stores state directly on the JVM heap. For high-cardinality stateful streams (e.g. 50M unique sessions or deduplication across 14-day watermarks), JVM heap explodes, causing prolonged Full GC pauses (>30s) and executor timeouts.
+**RocksDB StateStore:**
+- Stores state off-heap in local NVMe-backed RocksDB C++ instances.
+- Bypasses JVM garbage collection completely; memory footprint is strictly bounded via block cache (`spark.sql.streaming.stateStore.rocksdb.maxMemoryUsageMB`).
+- Checkpointing asynchronously syncs SST files to cloud storage (S3/ADLS/GCS).
+```python
+spark.conf.set("spark.sql.streaming.stateStore.providerClass",
+               "org.apache.spark.sql.execution.streaming.state.RocksDBStateStoreProvider")
+spark.conf.set("spark.sql.streaming.stateStore.rocksdb.boundedMemoryUsage", "true")
+```
+
+---
+
+### Q15: How does Databricks Photon vectorization differ architecturally from Spark's native Whole-Stage Java Codegen?
+
+**Difficulty:** `ARCHITECT` | **Niche:** `Catalyst Optimizer Internals`
+
+**Whole-Stage Codegen (Classic Spark):** Janino compiles physical operators into a single flat Java `while`-loop over rows. While it eliminates virtual dispatch, it is constrained by JVM JIT optimization limits, 64KB bytecode method limits, and Java's lack of explicit SIMD instruction utilization.
+**Databricks Photon:**
+- Rewrites the execution engine in native C++.
+- Vectorized execution: Processes columnar batches of 1,024-4,096 row vectors using CPU SIMD registers (AVX-512) for hardware-level parallelism.
+- Memory layout: Operates directly on native column vectors with zero JVM heap/deserialization overhead.
+- Seamless Fallback: Photon evaluates operators; if an unsupported operator (e.g. custom Python UDF) is encountered, it seamlessly passes data back to standard JVM execution.
 
 ---

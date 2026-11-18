@@ -7,7 +7,6 @@
 
 **Difficulty:** `MEDIUM` | **Niche:** `Indexing Architecture`
 
-**Direct 30-Second Answer:**
 - **Clustered Index:** The leaf nodes of the B-Tree **ARE the actual physical data pages**. A table can have only one clustered index because data rows can be physically sorted in only one order.
 - **Non-Clustered Index:** Leaf nodes contain index key values paired with a **row locator** (a clustering key pointer if the table has a clustered index, or a RID pointer if the table is a heap). If a query needs non-indexed columns, it must perform an expensive **Key Lookup** to the clustered index.
 
@@ -17,7 +16,6 @@
 
 **Difficulty:** `HARD` | **Niche:** `Columnstore Indexes`
 
-**Direct 30-Second Answer:**
 CCI reorganizes data from row-based pages into columnar **Rowgroups** (~1 million rows per rowgroup) and **Column Segments**:
 1. Column segments are compressed with dictionary and Lempel-Ziv compression, shrinking storage by 80%.
 2. **Batch Mode Processing:** SQL Server processes chunks of ~900 rows simultaneously in CPU registers instead of row-by-row mode.
@@ -41,7 +39,6 @@ CCI reorganizes data from row-based pages into columnar **Rowgroups** (~1 millio
 
 **Difficulty:** `HARD` | **Niche:** `Query Compilation & Sniffing`
 
-**Direct 30-Second Answer:**
 When a stored procedure executes for the first time, SQL Server inspects the passed parameter values and compiles an execution plan optimized specifically for that parameter's data distribution and caches it.
 - If the first parameter is rare (1 row), an Index Seek plan is cached. If subsequent calls pass a common parameter (1,000,000 rows), the cached Index Seek plan triggers millions of key lookups, destroying performance.
 **Remediation:**
@@ -55,7 +52,6 @@ When a stored procedure executes for the first time, SQL Server inspects the pas
 
 **Difficulty:** `HARD` | **Niche:** `Table Partitioning & Switching`
 
-**Direct 30-Second Answer:**
 Partition Switching is a metadata-only operation ($O(1)$) that moves an entire partition of data between a staging table and a production partitioned table:
 ```sql
 ALTER TABLE staging_orders SWITCH TO fact_orders PARTITION 15;
@@ -69,7 +65,6 @@ ALTER TABLE staging_orders SWITCH TO fact_orders PARTITION 15;
 
 **Difficulty:** `HARD` | **Niche:** `TempDB Tuning`
 
-**Direct 30-Second Answer:**
 High-concurrency workloads creating temporary tables (`#table`, `@table_var`) simultaneously request allocations on shared allocation map pages (PFS/SGAM), resulting in `PAGELATCH_UP` wait states in TempDB.
 **Remediation:**
 1. **Multiple Data Files:** Configure 1 TempDB data file per logical CPU core (up to 8 files initially) with identical growth settings.
@@ -134,6 +129,85 @@ SELECT emp_id, emp_name, manager_id, hierarchy_level
 FROM OrgHierarchy
 ORDER BY hierarchy_level, manager_id
 OPTION (MAXRECURSION 100);
+```
+
+---
+
+### Q11: Explain the internal architecture of SQL Server Clustered Columnstore Indexes: Rowgroups, Dictionaries, and Delta Stores.
+
+**Difficulty:** `HARD` | **Niche:** `Clustered Columnstore Indexes`
+
+**Internal Architecture:**
+- **Rowgroups:** Chunks of up to 1,048,576 rows compressed columnar into individual column segments.
+- **Column Segments:** Stores individual column data compressed with dictionary, bit-packing, and run-length encoding.
+- **Delta Store (B-Tree):** Small inserts (< 102,400 rows) are staged in a row-oriented B-tree Delta Store to avoid compressing tiny batches.
+- **Tuple Mover:** Background daemon scans closed Delta Stores (> 100k rows) and compresses them into columnar rowgroups.
+- Yields 10x compression and 100x query speedup on analytical aggregations.
+
+---
+
+### Q12: What is Parameter Sniffing in SQL Server, and what are the 4 production remediation strategies?
+
+**Difficulty:** `HARD` | **Niche:** `Parameter Sniffing Remediation`
+
+**Problem:** The query optimizer compiles and caches an execution plan based on the parameter value passed on the *first execution*. If the first parameter belongs to a rare customer (1 row), an Index Seek plan is cached. When subsequent queries execute with a common customer (1M rows), the Index Seek plan causes massive bookmark lookup I/O thrashing.
+**Remediation Strategies:**
+1. `OPTION (RECOMPILE)`: Forces plan re-evaluation on every call for variable queries.
+2. `OPTION (OPTIMIZE FOR (@val = 'UNKNOWN'))`: Compiles plan using typical average distribution.
+3. Local Variable Decoupling: Assign `@local_id = @param_id` (forces optimizer to use statistical density vector).
+4. Plan Guides / Query Store Plan Forcing.
+
+---
+
+### Q13: How does SQL Server Partition Switching achieve instantaneous, zero-logging data archiving?
+
+**Difficulty:** `HARD` | **Niche:** `Partition Switching Patterns`
+
+Partition switching is a pure metadata pointer swap in the system catalog (`sys.partitions`); zero physical data rows are moved.
+```sql
+-- 1. Create identical staging table on same filegroup with check constraints
+CREATE TABLE Staging_Sales ( ... ) ON SalesFG;
+ALTER TABLE Staging_Sales ADD CONSTRAINT chk_date CHECK (SaleDate >= '2026-10-01' AND SaleDate < '2026-11-01');
+
+-- 2. Populate staging table via bulk load
+
+-- 3. Instantaneous metadata switch (< 5 milliseconds):
+ALTER TABLE Fact_Sales SWITCH PARTITION 10 TO Staging_Sales;
+```
+**Rules:** Source and target tables must share identical schemas, indexes, filegroups, and check constraints.
+
+---
+
+### Q14: How does Read Committed Snapshot Isolation (RCSI) prevent reader-writer deadlocks, and how do you monitor TempDB version store pressure?
+
+**Difficulty:** `HARD` | **Niche:** `RCSI & Concurrency Control`
+
+**Mechanism:** `ALTER DATABASE db SET READ_COMMITTED_SNAPSHOT ON;`
+Readers read committed row versions from the **TempDB Version Store** rather than acquiring shared read locks (`S-locks`). Writers update rows and generate version records in TempDB, eliminating all reader-writer deadlocks.
+**TempDB Pressure:** Heavy update workloads fill TempDB version store space.
+**Monitoring:**
+```sql
+SELECT 
+  SUM(version_store_reserved_page_count) * 8 / 1024 AS version_store_mb
+FROM sys.dm_db_file_space_usage;
+```
+
+---
+
+### Q15: How do you detect missing indexes and high-cost queries using SQL Server Dynamic Management Views (DMVs)?
+
+**Difficulty:** `MEDIUM` | **Niche:** `Query Optimizer & Execution Plans`
+
+```sql
+-- Find top queries by CPU consumption with cached query plans
+SELECT TOP 5 
+  qs.total_worker_time / qs.execution_count AS avg_cpu,
+  SUBSTRING(st.text, (qs.statement_start_offset/2)+1, ((qs.statement_end_offset/2)+1)) AS query_text,
+  qp.query_plan
+FROM sys.dm_exec_query_stats qs
+CROSS APPLY sys.dm_exec_sql_text(qs.sql_handle) st
+CROSS APPLY sys.dm_exec_query_plan(qs.plan_handle) qp
+ORDER BY avg_cpu DESC;
 ```
 
 ---

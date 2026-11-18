@@ -15,7 +15,6 @@
 
 ### Q117: How do you distribute tasks and handle disputes within team members?
 
-**Direct 30-Second Answer:**
 - **Task Distribution Framework:** Balance **Strengths**, **Growth Goals**, and **Critical Path Risk**:
   - Assign mission-critical, complex architectural blocks (e.g., custom streaming state stores, CI/CD infrastructure) to senior engineers.
   - Pair junior/mid-level engineers on complex components to accelerate knowledge transfer while assigning them independent module ownership.
@@ -28,7 +27,6 @@
 
 ### Q118: If you face a major misalignment with a big client related to project timelines, how do you address this?
 
-**Direct 30-Second Answer:**
 1. **Immediate Transparency (No Last-Minute Surprises):** Communicate the variance as soon as risk is identified; never wait until milestone deadlines.
 2. **Deconstruct the Variance:** Present a clear, data-driven analysis of why the timeline shifted (e.g. unanticipated upstream source API rate limits, major scope additions, schema inconsistencies).
 3. **Offer Flexible Solutions (Iron Triangle):**

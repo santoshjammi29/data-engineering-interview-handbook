@@ -7,7 +7,6 @@
 
 **Difficulty:** `HARD` | **Niche:** `Python Internals & Memory`
 
-**Direct 30-Second Answer:**
 Python manages memory using two collaborative systems:
 1. **Reference Counting:** Every Python object contains an internal `ob_refcnt` counter. When an object is referenced, counter increments; when a variable goes out of scope or is deleted, it decrements. When `ob_refcnt == 0`, the memory is immediately freed.
 2. **Cyclic Garbage Collector (Generations 0, 1, 2):** Reference counting fails to detect reference cycles (Object A references B, and B references A). The cyclic GC inspects container objects (lists, dicts, custom classes), organizes them into 3 age generations, and breaks isolated reference cycles.
@@ -18,7 +17,6 @@ Python manages memory using two collaborative systems:
 
 **Difficulty:** `MEDIUM` | **Niche:** `Generators & Iterators`
 
-**Direct 30-Second Answer:**
 Reading a 20 GB CSV file into memory using `file.readlines()` or standard lists loads all 20 GB into RAM at once, triggering an immediate OS OOM crash.
 - **Generators (`yield`):** Maintain execution state lazily, yielding exactly **one record at a time** on-demand.
 - **Memory Footprint:** Memory consumption remains constant ($O(1)$ memory $\approx 4\text{KB}$ buffer) regardless of whether the file contains 1,000 lines or 1,000,000,000 lines.
@@ -41,7 +39,6 @@ Reading a 20 GB CSV file into memory using `file.readlines()` or standard lists 
 
 **Difficulty:** `HARD` | **Niche:** `PyArrow & Columnar Memory`
 
-**Direct 30-Second Answer:**
 Apache Arrow defines a standardized, language-independent columnar in-memory format:
 - **Zero-Copy Sharing:** Multiple runtimes (Python, Rust Polars, C++ DuckDB, JVM Spark) can map directly to the same shared memory buffer without serializing or copying bytes.
 - **CPU Cache Alignment:** Stores columnar arrays in 64-byte aligned contiguous memory blocks, maximizing CPU SIMD vectorization.
@@ -154,7 +151,6 @@ class OrderContract(BaseModel):
 
 **Difficulty:** `MEDIUM` | **Niche:** `Python Tooling & uv`
 
-**Direct 30-Second Answer:**
 `uv` is an extremely fast Python package installer and resolver written in **Rust** by the Astral team:
 - **$10\times \text{ to } 100\times$ Faster than `pip`:** Installs packages in milliseconds using global content-addressable caches and copy-on-write (reflink) file cloning.
 - **Deterministic Resolution:** Resolves universal `uv.lock` files across platforms, dramatically speeding up Docker container build times in CI/CD data pipelines.
@@ -165,8 +161,81 @@ class OrderContract(BaseModel):
 
 **Difficulty:** `HARD` | **Niche:** `C-Extensions & PyO3`
 
-**Direct 30-Second Answer:**
 When tight numeric loops, custom hashing, or binary parsing consume 90%+ of pipeline CPU time and cannot be expressed as vectorized NumPy/Polars operations:
 - Compiling algorithms via Cython or Rust PyO3 compiles the logic directly to native C machine instructions, eliminating dynamic Python type checking and bytecode overhead, providing a **$50\times \text{ to } 200\times$ performance increase**.
+
+---
+
+### Q11: How does CPython manage memory, and how do cyclic references trigger GC pauses in long-running pipelines?
+
+**Difficulty:** `HARD` | **Niche:** `CPython Memory & Cyclic GC`
+
+CPython relies primarily on **Reference Counting**.
+- Every object has an `ob_refcnt`. When reference count drops to 0, memory is immediately deallocated.
+**Cyclic References:** Object A points to Object B, and B points to A. When external references are removed, ref counts remain 1, leaking memory.
+**Generational GC (Generations 0, 1, 2):**
+- Scans reference graphs periodically using double-linked lists to detect isolated cycles.
+- *Pipeline Trap:* High-throughput streaming loops generating millions of cyclic objects trigger frequent Gen-2 full GC sweeps, pausing the Python process.
+- *Remediation:* Break cycles using `weakref`, invoke `gc.collect()` at end of micro-batches, or disable GC during tight loops.
+
+---
+
+### Q12: How does Apache Arrow implement zero-copy data sharing between Python processes and external engines?
+
+**Difficulty:** `ARCHITECT` | **Niche:** `Arrow Memory & Zero-Copy IPC`
+
+Traditional Python multiprocessing serializes data into bytes via `pickle`, pipes it over IPC sockets, and deserializes it in worker processes, incurring heavy CPU and memory overhead.
+**Apache Arrow Zero-Copy:**
+- Standardizes columnar in-memory data representation (RecordBatches).
+- Writes Arrow buffers into shared memory (`/dev/shm` or POSIX `mmap`).
+- Worker processes map the memory address directly into their virtual address space. Reading a column access pointers in shared memory with **0 serialization, 0 copying, and 0 memory duplication**.
+
+---
+
+### Q13: Why is Polars significantly faster than Pandas 2.0 for single-node ETL pipelines?
+
+**Difficulty:** `HARD` | **Niche:** `Polars vs Pandas 2.0 Engine`
+
+1. **Written in Rust:** Native machine code execution with zero GIL lock contention.
+2. **LazyFrame Optimization:** Constructs a logical query graph and applies Catalyst-like optimizations: predicate pushdown, projection pushdown, and type coercion before execution.
+3. **Multithreaded Parallelism:** Divides tasks across all available CPU cores using the Rayon work-stealing thread pool.
+4. **Arrow-Native Memory:** Directly implements Apache Arrow format for SIMD vectorization and cache locality.
+
+---
+
+### Q14: When should you use asyncio versus multiprocessing for high-throughput API extraction in Python?
+
+**Difficulty:** `MEDIUM` | **Niche:** `Concurrency & Subprocesses`
+
+**`asyncio` (Network/IO-Bound):**
+- Single-threaded event loop utilizing non-blocking sockets (`aiohttp`, `asyncpg`).
+- Can sustain 10,000+ concurrent HTTP connections with tiny memory footprint (~2KB per task).
+- Ideal for REST API data extractors and webhook listeners.
+**`multiprocessing` (CPU-Bound):**
+- Bypasses the Global Interpreter Lock (GIL) by spawning separate OS processes with dedicated Python interpreters.
+- Ideal for CPU-intensive data transformations, JSON compression, and cryptographic hashing.
+
+---
+
+### Q15: How do you author custom Rust extensions using PyO3 to accelerate performance-critical Python data transformations?
+
+**Difficulty:** `ARCHITECT` | **Niche:** `Arrow Memory & Zero-Copy IPC`
+
+PyO3 exposes Rust functions and structs as native Python modules.
+```rust
+use pyo3::prelude::*;
+
+#[pyfunction]
+fn compute_checksum(data: &[u8]) -> PyResult<u32> {
+    Ok(crc32fast::hash(data))
+}
+
+#[pymodule]
+fn fast_de(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(compute_checksum, m)?)?;
+    Ok(())
+}
+```
+Compiled into a native `.so` wheel using `maturin`. It runs at bare-metal C/Rust speed, bypasses the GIL, and integrates seamlessly into existing Python pipelines.
 
 ---

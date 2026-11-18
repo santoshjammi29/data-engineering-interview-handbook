@@ -31,7 +31,6 @@
 
 **Difficulty:** `HARD` | **Niche:** `dbt Snapshots & SCD2`
 
-**Direct 30-Second Answer:**
 dbt Snapshots track dimensional changes over time by automatically adding `dbt_valid_from`, `dbt_valid_to`, and `dbt_scd_id` columns:
 - **`timestamp` Strategy (Preferred):** Compares an `updated_at` column in the source. If `updated_at` is greater than the snapshot's valid_from, dbt expires the old row and inserts the new version.
 - **`check` Strategy:** Used when the source lacks an updated timestamp. dbt computes a hash across a list of specified columns (e.g. `check_cols = ['address', 'tier']`) to detect attribute divergence.
@@ -69,7 +68,6 @@ SELECT * FROM {{ model }} WHERE {{ column_name }} <= 0
 
 **Difficulty:** `MEDIUM` | **Niche:** `Jinja Macros & Modularity`
 
-**Direct 30-Second Answer:**
 Macros are reusable Jinja functions that dynamically generate SQL. Instead of writing duplicate `CASE` statements across 20 models, encapsulate the logic in a macro:
 ```sql
 {% macro cents_to_dollars(column_name, decimal_places=2) %}
@@ -86,7 +84,6 @@ SELECT order_id, {{ cents_to_dollars('order_total_cents') }} AS order_total FROM
 
 **Difficulty:** `HARD` | **Niche:** `Semantic Layer & Metrics`
 
-**Direct 30-Second Answer:**
 The dbt Semantic Layer defines business metrics (e.g. `monthly_recurring_revenue`, `churn_rate`) centrally in code alongside the underlying data models.
 - Downstream BI tools (Tableau, Power BI, Hex) query the MetricFlow API rather than authoring divergent SQL aggregations.
 - Guarantees that Revenue means the exact same number regardless of which dashboard or tool visualizes the data.
@@ -97,7 +94,6 @@ The dbt Semantic Layer defines business metrics (e.g. `monthly_recurring_revenue
 
 **Difficulty:** `MEDIUM` | **Niche:** `Environment Isolation`
 
-**Direct 30-Second Answer:**
 dbt uses `profiles.yml` with distinct target configurations. In `dev`, dbt uses custom schema prefixes (e.g. `dbt_sjammi_marts`) so developers build models inside isolated developer sandboxes. In `prod`, CI/CD pipelines run with `--target prod`, deploying directly to governed enterprise schemas.
 
 ---
@@ -122,9 +118,64 @@ dbt uses `profiles.yml` with distinct target configurations. In `dev`, dbt uses 
 
 **Difficulty:** `ARCHITECT` | **Niche:** `dbt Mesh & Governance`
 
-**Direct 30-Second Answer:**
 dbt Mesh splits monolithic enterprise dbt projects into autonomous, domain-specific projects (e.g. Marketing dbt project, Finance dbt project):
 - **Cross-Project `ref()`:** Allows Project B to reference models in Project A.
 - **Data Contracts & Model Access:** Public models enforce strict schema contracts (`contract: {enforced: true}`). If upstream developers alter a contracted column, the dbt build fails, preventing downstream breaking changes.
+
+---
+
+### Q11: Compare dbt incremental strategies: merge vs append vs insert_overwrite across BigQuery, Snowflake, and Databricks.
+
+**Difficulty:** `HARD` | **Niche:** `Incremental Modeling Strategies`
+
+**1. `merge` (Default for Snowflake/Databricks):** Executes SQL `MERGE INTO`. Updates matching primary keys, inserts new records. High write amplification on massive tables without Deletion Vectors.
+**2. `append`:** Pure `INSERT INTO`. Fastest, lowest compute, ideal for immutable clickstreams/logs.
+**3. `insert_overwrite` (Standard for BigQuery/Databricks Partitioned Tables):** Replaces entire matching partition partitions (e.g. `date(tx_time) = yesterday`). Avoids row-level update overhead; atomic and highly performant for date-partitioned warehouses.
+
+---
+
+### Q12: How do dbt snapshots implement SCD Type 2, and what is the difference between check and timestamp strategies?
+
+**Difficulty:** `HARD` | **Niche:** `Snapshots & SCD Architecture`
+
+dbt snapshots maintain historical state by adding `dbt_valid_from`, `dbt_valid_to`, and `dbt_scd_id` columns.
+**1. `timestamp` Strategy:** Compares an `updated_at` column in the source table. If `source.updated_at > snapshot.dbt_valid_from`, it closes the previous row and inserts a new active row.
+**2. `check` Strategy:** Used when the source table lacks a reliable timestamp. dbt computes a hash of monitored columns (`check_cols = ['email', 'address']`). If the hash differs, the record state is updated.
+*Trap:* Source deletions are not marked dead unless `invalidate_hard_deletes=True` is enabled.
+
+---
+
+### Q13: How does the dbt Semantic Layer (MetricFlow) enforce governed metrics across disparate BI tools?
+
+**Difficulty:** `ARCHITECT` | **Niche:** `dbt Semantic Layer & Metrics`
+
+Traditionally, business logic (e.g. `Gross Margin` or `Active ARR`) was defined inconsistently inside Tableau, Power BI, and Looker SQL models.
+**dbt Semantic Layer:**
+- Defines semantic models in YAML: entities, dimensions (time/categorical), and measures.
+- **MetricFlow Engine:** Automatically generates SQL queries with proper join paths and non-additive metric aggregations.
+- BI tools query dbt's semantic proxy via JDBC/GraphQL, ensuring identical metrics across all dashboards and downstream consumers.
+
+---
+
+### Q14: How does dbt Mesh enable decentralized Data Mesh architectures with cross-project dependencies and Model Contracts?
+
+**Difficulty:** `ARCHITECT` | **Niche:** `dbt Semantic Layer & Metrics`
+
+In large enterprises, a single monolithic dbt project with 4,000 models causes dependency chaos and slow compilation.
+**dbt Mesh Architecture:**
+1. Splits repositories into domain-owned projects (e.g. Core Billing, Marketing, Logistics).
+2. **Public Models & Contracts:** Producers designate specific models as `access: public` and enforce strict schema contracts (`contract: {enforced: true}`).
+3. **Cross-Project Referencing:** Consumer projects reference upstream models using `ref('core_billing', 'dim_customers')`.
+4. Upstream producers cannot deploy breaking schema changes without passing CI contract tests.
+
+---
+
+### Q15: What is the difference between dbt Generic Tests, Singular Tests, and Unit Tests in dbt 1.8+?
+
+**Difficulty:** `MEDIUM` | **Niche:** `Testing, Documentation & Lineage`
+
+**1. Generic Tests:** Parameterized assertion tests (`unique`, `not_null`, `accepted_values`, `relationships`) declared in YAML.
+**2. Singular Tests:** Custom SQL queries in `tests/` directory that return failing rows (`SELECT * FROM payments WHERE amount < 0`). If the query returns 0 rows, the test passes.
+**3. Unit Tests (dbt 1.8+):** Mock-based unit testing. Feeds synthetic mock inputs to a model and asserts the output SQL logic without touching physical warehouse tables.
 
 ---

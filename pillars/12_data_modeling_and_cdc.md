@@ -31,7 +31,6 @@
 
 **Difficulty:** `HARD` | **Niche:** `CDC Architecture & Debezium`
 
-**Direct 30-Second Answer:**
 - **Query-Based CDC (`WHERE updated_at > watermark`):** Misses physical `DELETE` operations, imposes heavy query overhead on production databases, and misses intermediate state changes that occur between polling cycles.
 - **Log-Based CDC (Debezium):** Reads directly from database internal transaction logs (e.g. PostgreSQL WAL, MySQL binlog). Captures all `INSERT`, `UPDATE`, and `DELETE` events with zero application overhead, guarantees exact ordering, and captures true transaction boundaries without modifying source schemas.
 
@@ -53,7 +52,6 @@ $$\text{Partitions} = \max\left(\frac{500}{50}, \frac{500}{25}\right) = \max(10,
 
 **Difficulty:** `ARCHITECT` | **Niche:** `Outbox Pattern & Dual Writes`
 
-**Direct 30-Second Answer:**
 - **The Dual-Write Problem:** Updating a database and publishing an event to Kafka in the same application service risks inconsistency if Kafka crashes after the database commits, or vice versa.
 - **The Solution:** Inside the **exact same local ACID database transaction**, write business state to the `orders` table AND append an event record into an `outbox` table.
 - A dedicated log-tailing process (Debezium / Kafka Connect) reads from the `outbox` table transaction log and publishes guaranteed events to Kafka with zero data loss.
@@ -64,7 +62,6 @@ $$\text{Partitions} = \max\left(\frac{500}{50}, \frac{500}{25}\right) = \max(10,
 
 **Difficulty:** `HARD` | **Niche:** `Stream Deduplication`
 
-**Direct 30-Second Answer:**
 1. Maintain a **Bloom Filter** (space-efficient probabilistic bit array) in memory representing seen transaction IDs over the last 15 minutes.
 2. If the Bloom filter returns `False`, the transaction is guaranteed unique $\rightarrow$ emit immediately.
 3. If it returns `True` (potential false positive), perform an exact lookup in an off-heap state store (RocksDB) to confirm duplication.
@@ -111,9 +108,64 @@ $$\text{Partitions} = \max\left(\frac{500}{50}, \frac{500}{25}\right) = \max(10,
 
 **Difficulty:** `MEDIUM` | **Niche:** `Dimensional Modeling`
 
-**Direct 30-Second Answer:**
 A Factless Fact Table contains no numerical measures or metrics; it consists purely of foreign keys representing the **occurrence of an event** or relationship:
 1. **Event Tracking (Student Attendance):** `fact_attendance` containing `(student_key, course_key, date_key)`. Answers: *Did student attend class on this date?*
 2. **Coverage / Eligibility (Insurance Eligibility):** `fact_promotion_coverage` containing `(product_key, store_key, promotion_key, date_key)`. Answers: *Which products were eligible for promotional discounts in which stores?*
+
+---
+
+### Q11: Provide a complete architectural comparison of Slowly Changing Dimension (SCD) Types 1, 2, 3, 4, and 6.
+
+**Difficulty:** `HARD` | **Niche:** `SCD Types 1-6 Architecture`
+
+**Type 1 (Overwrite):** Overwrites historical data. Zero history, updates in-place.
+**Type 2 (Historical Rows):** Inserts a new row for each change with `start_date`, `end_date`, and `is_current` flag. Preserves infinite history.
+**Type 3 (Previous Column):** Adds a column `previous_address` to store the immediate predecessor state.
+**Type 4 (History Table):** Base dimension keeps current state (Type 1); historical changes are written to a separate `dim_customer_history` table.
+**Type 6 (Hybrid 1 + 2 + 3):** Combines historical rows (Type 2) with a current attribute column (Type 1) across all historical records, enabling both point-in-time and current-state reporting from a single table.
+
+---
+
+### Q12: How does Data Vault 2.0 use Hash Keys to eliminate ETL loading dependencies between Hubs, Links, and Satellites?
+
+**Difficulty:** `HARD` | **Niche:** `Data Vault 2.0 Modeling`
+
+In traditional Data Vault 1.0, hubs generated integer surrogate keys (sequences), forcing links to wait for hubs to load before foreign keys could be resolved.
+**Data Vault 2.0 (Hash Keys):**
+- Replaces surrogate keys with cryptographic hashes (MD5 or SHA-256) of business keys: `HK_Customer = SHA256(UPPER(TRIM(tenant_id)) || '|' || UPPER(TRIM(customer_id)))`.
+- Because hashes are deterministic and calculated in parallel, Hubs, Links, and Satellites can be loaded **simultaneously in parallel** with zero ETL dependency bottlenecks.
+
+---
+
+### Q13: How does the Transactional Outbox Pattern combined with Debezium CDC prevent dual-write data inconsistency?
+
+**Difficulty:** `ARCHITECT` | **Niche:** `Change Data Capture (CDC)`
+
+**The Dual-Write Problem:** Microservice writes to relational DB and publishes to Kafka. If Kafka fails after the DB commits, data is lost; if the DB fails after publishing, phantom events are created.
+**Transactional Outbox Pattern:**
+1. The business transaction writes business entity records and writes an event payload into an `outbox_table` inside the **same local ACID database transaction**.
+2. **Debezium CDC:** Reads database transaction log (WAL / binlog) and extracts outbox table inserts into Kafka.
+3. Eliminates dual-write inconsistencies with guaranteed at-least-once delivery.
+
+---
+
+### Q14: Compare Star Schema vs Snowflake Schema vs One Big Table (OBT) in modern cloud data warehouses.
+
+**Difficulty:** `MEDIUM` | **Niche:** `Dimensional Modeling (Kimball)`
+
+**1. Star Schema (Kimball):** De-normalized dimensions surrounding fact tables. Clean semantic model, fast query joins, balanced storage.
+**2. Snowflake Schema:** Normalized dimensions (sub-dimensions branched out). Minimizes storage redundancy, but increases join overhead.
+**3. One Big Table (OBT):** Completely pre-joined denormalized table with 100+ columns. Zero joins, blazing query performance on columnar engines (BigQuery/ClickHouse/Snowflake), at the cost of higher storage and complex update synchronization.
+
+---
+
+### Q15: What is Bi-Temporal Data Modeling, and why is it mandatory for regulated financial risk engines?
+
+**Difficulty:** `ARCHITECT` | **Niche:** `SCD Types 1-6 Architecture`
+
+Bi-Temporal modeling tracks two distinct timelines for every record:
+1. **Valid Time (Business Time):** The time window during which the event was true in the real world (`valid_from`, `valid_to`).
+2. **Transaction Time (System Time):** The time window during which the record was physically stored in the database system (`system_from`, `system_to`).
+**Financial Audit Use Case:** A risk calculation executed on March 31st must be reproducible on December 31st, *even if retroactive corrections were entered in July*. System time allows querying the database exactly as it existed on March 31st.
 
 ---

@@ -18,7 +18,6 @@
 
 **Difficulty:** `HARD` | **Niche:** `VertiPaq Engine & Star Schema`
 
-**Direct 30-Second Answer:**
 VertiPaq compresses columns independently using **Dictionary Encoding**:
 - **Flat Wide Table (Anti-pattern):** Storing customer attributes (name, address, city) repeated across 100 million order rows explodes dictionary sizes and destroys compression efficiency.
 - **Star Schema (Best Practice):** Normalizing attributes into dimension tables leaves small integer surrogate keys in the fact table. Fact table integer columns compress via Bit-Packing into negligible memory, maximizing CPU cache utilization and speeding up aggregations.
@@ -29,7 +28,6 @@ VertiPaq compresses columns independently using **Dictionary Encoding**:
 
 **Difficulty:** `HARD` | **Niche:** `DAX Internals & Context`
 
-**Direct 30-Second Answer:**
 - **Row Context:** The concept of the 'current row' during iterative calculations (e.g. calculated columns, `SUMX`, `FILTER`). Does NOT filter the table automatically.
 - **Filter Context:** The set of active filters applied to the data model by report slicers, visuals, page filters, and `CALCULATE()` statements.
 - **Context Transition:** Occurs when `CALCULATE()` is invoked inside a Row Context. It automatically converts the current row's column values into an equivalent Filter Context, filtering the entire data model.
@@ -51,7 +49,6 @@ VertiPaq compresses columns independently using **Dictionary Encoding**:
 
 **Difficulty:** `HARD` | **Niche:** `Aggregation Tables & Composite Models`
 
-**Direct 30-Second Answer:**
 In Composite Models, create a pre-aggregated table (e.g. `agg_sales_monthly`) cached in **Import Mode**, while keeping the underlying billion-row `fact_sales` in **DirectQuery Mode**:
 - **Automatic Query Routing:** When an executive visual asks for monthly sales, Power BI intercepts the query and answers it from the fast in-memory aggregation table ($< 100\text{ms}$).
 - If a user drills down to individual invoice line items, Power BI automatically falls back to DirectQuery against the lakehouse.
@@ -109,5 +106,63 @@ In Composite Models, create a pre-aggregated table (e.g. `agg_sales_monthly`) ca
 2. Copy the query into **DAX Studio**; enable **Server Timings**.
 3. Inspect the split between **Storage Engine (SE)** and **Formula Engine (FE)**:
    - If Formula Engine $> 30\%$: DAX query contains un-vectorized row-by-row iteration (e.g. non-sargable `IF` inside `SUMX`). Rewrite to push filtering into the VertiPaq Storage Engine.
+
+---
+
+### Q11: How does the Power BI VertiPaq engine compress tabular data using Dictionary, Value, and Run-Length Encoding?
+
+**Difficulty:** `HARD` | **Niche:** `VertiPaq Engine Internals`
+
+VertiPaq achieves up to 10x-20x in-memory compression through 3 sequential encoding phases:
+1. **Value Encoding:** Subtracks the minimum value from integer columns to reduce bit-width (e.g. values $1001-1005$ store integers $1-5$, requiring 3 bits instead of 32 bits).
+2. **Dictionary Encoding:** Replaces strings with compact integer IDs and maintains an alphabetical dictionary.
+3. **Run-Length Encoding (RLE):** Compresses repeated adjacent values into `(Value, Count)` pairs. Sorting the table by high-frequency columns prior to compression maximizes RLE efficiency.
+
+---
+
+### Q12: Explain DAX Context Transition and how CALCULATE() mutates Row Context into Filter Context.
+
+**Difficulty:** `HARD` | **Niche:** `DAX Context Transition`
+
+**Row Context:** Iterates row by row (e.g. inside `SUMX` or calculated columns); aware only of the current row's values, but does not filter the model.
+**Filter Context:** The active set of filters applied by slicers, report visuals, and DAX filters that restrict data across table relationships.
+**Context Transition:** When `CALCULATE()` (or a measure reference) is evaluated inside an existing Row Context, it automatically transforms all column values of the current row into an equivalent Filter Context, filtering related tables along active relationships.
+
+---
+
+### Q13: How do Power BI Composite Models and Aggregation Tables eliminate DirectQuery latency on 100-billion row fact tables?
+
+**Difficulty:** `HARD` | **Niche:** `Aggregation Tables & Composite Models`
+
+Composite models allow mixing in-memory **Import mode** tables with live **DirectQuery** tables in the same model.
+**Aggregation Tables:**
+- Pre-aggregate the billion-row fact table to a coarse grain (e.g. `Year`, `Month`, `Store_ID`, `Sum(Sales)`).
+- Load the aggregation table in fast in-memory Import mode.
+- Map the aggregation table to the underlying DirectQuery detail table in Power BI relationship properties.
+- *Query Routing:* High-level dashboard queries hit the in-memory aggregation table (sub-second); detail drill-through queries automatically fall back to DirectQuery SQL.
+
+---
+
+### Q14: How do XMLA endpoints enable programmatic partition refresh and deployment automation in Power BI Premium?
+
+**Difficulty:** `HARD` | **Niche:** `Incremental Refresh & Partitioning`
+
+Power BI Premium workspaces expose read/write **XMLA endpoints** identical to SQL Server Analysis Services (SSAS).
+- Data engineers use tools like Tabular Editor, PowerShell, or Azure Data Factory to connect to `powerbi://api.powerbi.com/v1.0/myorg/WorkspaceName`.
+- **Micro-Partition Refresh:** Instead of refreshing the entire semantic model, pipelines execute TMSL (Tabular Model Scripting Language) to refresh only the single daily partition: `{"refresh": {"type": "full", "partition": "FactSales_20261118"}}`.
+
+---
+
+### Q15: How do you implement Dynamic Row-Level Security (RLS) in Power BI using USERPRINCIPALNAME()?
+
+**Difficulty:** `MEDIUM` | **Niche:** `Row-Level Security Architecture`
+
+1. Create an `EmployeeSecurity` table mapping Azure AD emails to authorized branch IDs (`UserEmail`, `BranchID`).
+2. Establish a 1-to-many relationship from `EmployeeSecurity` to `Dim_Branch` with cross-filter direction set to 'Single' or 'Both'.
+3. Define an RLS Role in Power BI modeling tab:
+```dax
+[UserEmail] = USERPRINCIPALNAME()
+```
+When a user opens the report, `USERPRINCIPALNAME()` extracts their authenticated Azure AD identity, filters `Dim_Branch`, and cascades down to restrict fact table rows dynamically.
 
 ---

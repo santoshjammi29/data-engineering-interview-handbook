@@ -55,7 +55,6 @@ AWS Glue is a fully managed, serverless ETL service built on Apache Spark.
 
 ### Q95: How do you orchestrate multiple ETL jobs in AWS?
 
-**Direct 30-Second Answer:**
 1. **AWS Step Functions (Serverless State Machines - Best Practice):**
    - Visual JSON/ASL (Amazon States Language) state machine that coordinates Glue jobs, Lambda functions, Athena queries, and ECS tasks.
    - Built-in error handling (`Retry` and `Catch`), exponential backoff, parallel execution branches, and human-in-the-loop task tokens.

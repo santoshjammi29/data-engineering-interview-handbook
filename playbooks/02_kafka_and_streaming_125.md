@@ -2,7 +2,6 @@
 
 ### Q51: Explain your real time experience in Kafka.
 
-**Direct 30-Second Answer:**
 "In our production enterprise payments and telemetry lakehouse, I architected a multi-cluster Apache Kafka deployment (KRaft mode) processing over **150,000 events/second** (peaks of 250MB/sec). 
 My responsibilities included:
 1. **Topic Partition Topology:** Sizing partitions based on consumer throughput ($P = \max(T/P_{prod}, T/P_{cons})$) across 32 partitions per high-velocity topic.
@@ -13,7 +12,6 @@ My responsibilities included:
 
 ### Q52: How do you tackle flaws and failure modes in Kafka?
 
-**Direct 30-Second Answer:**
 We tackle Kafka flaws through 4 core architectural guardrails:
 1. **Consumer Rebalance Storms:** Caused by slow processing exceeding `max.poll.interval.ms`. We migrated to the **Cooperative Sticky Assignor** (`partition.assignment.strategy = CooperativeStickyAssignor`), which incrementally reassigns only displaced partitions instead of triggering a 'stop-the-world' rebalance across all consumers.
 2. **Poison Pill Messages (Malformed Payloads):** When a deserialization error occurs, catching the exception, publishing the bad record with header metadata to a **Dead Letter Queue (DLQ)** topic, and advancing consumer offset to prevent stream blockage.
@@ -24,7 +22,6 @@ We tackle Kafka flaws through 4 core architectural guardrails:
 
 ### Q53: How do you ensure high throughput and low latency in Kafka?
 
-**Direct 30-Second Answer:**
 Tune producer batching, broker I/O, and consumer fetching in lockstep:
 - **Producer High-Throughput Tuning:**
   - `batch.size = 65536` (64 KB buffer per partition)
@@ -73,7 +70,6 @@ sequenceDiagram
 
 ### Q55: How do you handle schema evolution from Kafka to Delta Lake?
 
-**Direct 30-Second Answer:**
 1. **Confluent Schema Registry & Avro:** Enforce **BACKWARD_TRANSITIVE** or **FULL** compatibility on the Kafka topic. Producers cannot register breaking schema changes (e.g. dropping non-optional fields or changing types).
 2. **Spark Auto Loader Ingestion (`cloudFiles`):**
    ```python
@@ -96,7 +92,6 @@ sequenceDiagram
 
 ### Q56: Checkpointing (offsets, state, metadata).
 
-**Direct 30-Second Answer:**
 Checkpointing provides fault tolerance and end-to-end exactly-once guarantees by persisting 4 internal subdirectories on durable cloud object storage:
 1. `offsets/`: Write-Ahead Log (WAL) recording the exact starting and ending source offsets (e.g. Kafka partition offsets) for each micro-batch.
 2. `commits/`: Contains empty commit files written only after all sinks complete processing. When restarting, if an offset exists in `offsets/` but not in `commits/`, Spark replays that exact batch.
@@ -107,7 +102,6 @@ Checkpointing provides fault tolerance and end-to-end exactly-once guarantees by
 
 ### Q57: Watermarking & late data handling.
 
-**Direct 30-Second Answer:**
 Watermarking establishes how late incoming data can arrive relative to event-time before being discarded.
 - **Definition:** Watermark delay $T$ means Spark drops all records with event timestamp:
   $$\text{event\_time} < \max(\text{event\_time}) - T$$
@@ -135,7 +129,6 @@ df_streaming_agg = (
 
 ### Q58: State management across micro-batches.
 
-**Direct 30-Second Answer:**
 Stateful operations require maintaining historical state across micro-batches.
 1. **Default HDFS-Backed State Store:** Maintains the entire state map on the JVM Java heap. At scale (millions of keys), this triggers severe GC pause storms and executor OOMs.
 2. **RocksDB State Store (Databricks / Production Standard):**

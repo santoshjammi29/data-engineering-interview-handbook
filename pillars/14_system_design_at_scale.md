@@ -126,3 +126,60 @@
 4. **Blameless Post-Mortem (48h):** Publish RCA document analyzing timeline, root cause, detection gap, and automated action items to eliminate single points of failure.
 
 ---
+
+### Q11: How do you architect a multi-tenant Lakehouse serving 10,000 corporate clients balancing cost, data isolation, and query performance?
+
+**Difficulty:** `ARCHITECT` | **Niche:** `Multi-Tenant Lakehouse Architecture`
+
+**Tiered Multi-Tenant Architecture:**
+1. **Storage Isolation (Bronze/Silver):** Store multi-tenant data in shared tables partitioned physically by `tenant_id` or clustered via Liquid Clustering. Encrypt with tenant-specific keys or envelope encryption.
+2. **Access Isolation (Unity Catalog):** Implement dynamic row filtering (`WHERE tenant_id = current_user_tenant()`) so tenants can never query each other's data.
+3. **Compute Isolation (Gold/VIP Tenants):** High-tier enterprise clients receive dedicated serverless compute endpoints to prevent noisy-neighbor query starvation; standard tenants share autoscaling serverless SQL pools.
+
+---
+
+### Q12: Design a high-throughput, dual-storage Real-Time Feature Store achieving sub-10ms point lookups and point-in-time training reproducibility.
+
+**Difficulty:** `ARCHITECT` | **Niche:** `Real-Time Feature Store Architecture`
+
+**Dual-Storage Feature Store Architecture:**
+1. **Online Store (Low-Latency Serving):** Backed by Redis Cluster or AWS DynamoDB. Spark Streaming writes aggregated features (e.g. `user_clicks_last_10m`) into Redis key-value pairs, serving real-time model inference in < 5ms.
+2. **Offline Store (Historical Training):** Backed by Delta Lake / Iceberg tables. Stores complete historical feature logs with timestamps.
+3. **Point-in-Time Correctness:** Feature store joins training labels with feature state using an as-of join (`time_travel`), preventing future data leakage into ML models.
+
+---
+
+### Q13: What architectural strategies reduce cloud compute spend by 40% in enterprise Spark/Databricks deployments?
+
+**Difficulty:** `HARD` | **Niche:** `Lakehouse FinOps & Cost Engineering`
+
+1. **Aggressive Auto-Termination:** Set cluster auto-termination to 10-15 minutes on interactive developer clusters.
+2. **Spot / Preemptible Instance Fallback:** Configure worker pools with 70% Spot instances and 30% On-Demand instances, with auto-fallback on Spot reclamation.
+3. **Job Clusters Over All-Purpose Clusters:** Never run production ETL on all-purpose clusters; job clusters are billed at 50% lower DBU rates.
+4. **Photon ROI Gating:** Enable Photon strictly on I/O-heavy, vectorized join/aggregation queries; disable on simple Python/UDF workloads.
+5. **Serverless SQL Warehouses:** Automatically scales down to 0 instances when idle.
+
+---
+
+### Q14: How do you implement Command Query Responsibility Segregation (CQRS) and Event Sourcing using Kafka and Delta Lake?
+
+**Difficulty:** `ARCHITECT` | **Niche:** `Event Sourcing & CQRS Lakehouses`
+
+**Event Sourcing:** Store state changes as an immutable sequence of events (`OrderCreated`, `PaymentAuthorized`, `OrderShipped`) in Kafka and append to Bronze Delta Lake.
+**CQRS Separation:**
+- **Command Side (Write):** Microservices validate business rules and append events to Kafka.
+- **Query Side (Read Projection):** Spark Structured Streaming consumes events from Kafka, builds denormalized read-optimized materialized views in Silver/Gold Delta tables, and indexes them for BI and API queries.
+
+---
+
+### Q15: How does automated column-level data lineage operate in modern catalogs like Unity Catalog and Apache Atlas?
+
+**Difficulty:** `ARCHITECT` | **Niche:** `End-to-End Lineage Governance`
+
+**Mechanism:**
+1. During query planning and Whole-Stage Codegen, Catalyst traces the transformation expression graph linking output attributes to input source columns.
+2. When Spark writes to storage, Catalyst extracts the lineage DAG: `TargetTable.ColumnA = Expression(SourceTable1.ColX, SourceTable2.ColY)`.
+3. Lineage metadata is dispatched asynchronously to the catalog metastore (Unity Catalog / OpenLineage / Atlas) without adding latency to query execution.
+4. Enables instant upstream root-cause impact analysis and automated PII compliance tracking.
+
+---

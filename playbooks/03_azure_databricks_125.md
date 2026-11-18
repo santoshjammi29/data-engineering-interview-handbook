@@ -2,7 +2,6 @@
 
 ### Q61: How do you pass parameter from one Notebook to another Notebook?
 
-**Direct 30-Second Answer:**
 1. **`dbutils.notebook.run()` with Arguments:**
    Pass parameters as a Python dictionary to `dbutils.notebook.run("path", timeout_seconds, {"param_key": "param_val"})`.
 2. **Accessing via Databricks Widgets:**
@@ -30,7 +29,6 @@
 
 ### Q62: If records are moved from source to target table and source is deleted, how do you identify deleted records? (Upsert & Delete detection)
 
-**Direct 30-Second Answer:**
 Execute a **Full Outer Join** or **Left Anti Join** between the target table and the current source snapshot:
 - **Left Anti Join:** Records existing in `target` but missing in `source` represent deleted records.
 - **Delta Lake Change Data Feed (CDF):** If CDC is enabled on the source table (`delta.enableChangeDataFeed = true`), Delta automatically tracks row-level changes with metadata columns: `_change_type = 'delete'`, `_commit_version`, `_commit_timestamp`.
@@ -72,7 +70,6 @@ WHEN NOT MATCHED THEN
 
 ### Q64: A Delta table has doubled in size over time. How would you optimize the performance of this Delta table?
 
-**Direct 30-Second Answer:**
 Execute a 4-step Lakehouse compaction and pruning regime:
 1. **Compaction (`OPTIMIZE`):** Merge thousands of small, fragmented files into standard 1GB files:
    ```sql
@@ -98,7 +95,6 @@ Execute a 4-step Lakehouse compaction and pruning regime:
 
 ### Q65: In which places have you used the Databricks ecosystem during production?
 
-**Direct 30-Second Answer:**
 1. **Data Ingestion & Bronze Landing:** Auto Loader (`cloudFiles`) for streaming ingestion of IoT, Kafka, and ERP JSON dumps into Delta Lake Bronze.
 2. **ETL & Data Quality:** Lakeflow Pipelines (Delta Live Tables - DLT) with `EXPECT` constraints for automated data quality gates in Silver cleaning.
 3. **Serving & BI:** Databricks SQL (DBSQL) Serverless Warehouses powered by Photon engine for Tableau and Power BI direct lakehouse queries.
@@ -122,7 +118,6 @@ Execute a 4-step Lakehouse compaction and pruning regime:
 
 ### Q67: Difference between Full load and Incremental load?
 
-**Direct 30-Second Answer:**
 - **Full Load:** Truncates and reloads the entire source table on every run. Simple to implement but becomes computationally prohibitive, cost-inefficient, and creates massive downtime at scale ($> 1\text{TB}$).
 - **Incremental Load:** Ingests only new, modified, or deleted records since the high-watermark timestamp or transaction commit ID of the previous run. Drastically reduces compute time, network I/O, and storage churn.
 
@@ -170,7 +165,6 @@ def upsert_to_delta(micro_batch_df, batch_id):
 
 ### Q69: If a Spark job is running slow on Databricks, how will you Optimize it?
 
-**Direct 30-Second Answer:**
 1. **Enable Photon Engine:** Toggle Photon on the Databricks cluster for $3\times \text{ to } 8\times$ faster vectorized C++ query execution.
 2. **Review Query Profile in Spark UI:** Identify long task stages, high spill to disk, and executor skew.
 3. **Tune Shuffle & AQE:** Verify AQE is active (`spark.sql.adaptive.enabled = true`). Adjust `spark.sql.adaptive.advisoryPartitionSizeInBytes = 67108864` (64MB).
@@ -181,7 +175,6 @@ def upsert_to_delta(micro_batch_df, batch_id):
 
 ### Q70: What do you mean by small file problem and how do you solve this problem?
 
-**Direct 30-Second Answer:**
 The **Small File Problem** occurs when streaming or high-frequency batch jobs write thousands of tiny Parquet files ($< 10\text{MB}$ each). Reading thousands of files causes massive cloud storage metadata overhead (millions of `GET/LIST` requests) and degrades query throughput.
 - **Solution 1 - Delta Auto Compaction & Optimized Writes:**
   ```sql
@@ -197,7 +190,6 @@ The **Small File Problem** occurs when streaming or high-frequency batch jobs wr
 
 ### Q71: How partitions count is decided? What will you do if partitions are too low?
 
-**Direct 30-Second Answer:**
 - **Target Partition Sizing:** Ideal partition size in Spark memory is **100 MB to 200 MB**.
   $$\text{Partitions} = \frac{\text{Total Stage Data Size}}{128\text{MB}}$$
 - **Rule of Thumb:** Total partitions should be **$2\times \text{ to } 3\times$ the number of total available CPU cores** across all cluster executors.
@@ -209,7 +201,6 @@ The **Small File Problem** occurs when streaming or high-frequency batch jobs wr
 
 ### Q72: How do you process a dataset of 5TB size in Databricks?
 
-**Direct 30-Second Answer:**
 1. **Cluster Topology:** Size a multi-node worker cluster (e.g. 16 workers, `Standard_E16ds_v5` with 16 vCPUs and 128 GB RAM each = 2 TB total RAM, 256 cores) with cluster autoscaling.
 2. **Photon Engine:** Enable Photon for vectorized C++ execution.
 3. **Partitioning & Liquid Clustering:** Cluster target Delta tables by primary query filters (`CLUSTER BY (country, event_date)`).
@@ -220,7 +211,6 @@ The **Small File Problem** occurs when streaming or high-frequency batch jobs wr
 
 ### Q73: How do you design a pipeline with the help of Databricks?
 
-**Direct 30-Second Answer:**
 Design around the **Medallion Architecture** using modern Databricks Lakeflow / Delta Live Tables (DLT):
 1. **Bronze Layer:** Stream raw ingested files into append-only Delta tables with Auto Loader (`cloudFiles`).
 2. **Silver Layer:** Apply schema expectations (`EXPECT`), parse JSON structures, scrub nulls, and deduplicate with `ROW_NUMBER()`.
@@ -230,7 +220,6 @@ Design around the **Medallion Architecture** using modern Databricks Lakeflow / 
 
 ### Q74: How do you integrate Databricks and Azure Data Factory?
 
-**Direct 30-Second Answer:**
 Use the native **ADF Azure Databricks Linked Service**:
 1. **Security & Identity:** Connect securely via **System-Assigned Managed Identity (SMI)** or Service Principal with secrets in Azure Key Vault.
 2. **Activity Types:** Invoke pipelines using the **Databricks Notebook Activity** or **Databricks Python Activity**.
@@ -251,7 +240,6 @@ Use the native **ADF Azure Databricks Linked Service**:
 
 ### Q76: How does Databricks interact with Data Lake storage (ADLS Gen2)?
 
-**Direct 30-Second Answer:**
 Databricks interacts with ADLS Gen2 using the **ABFS (Azure Blob File System) driver** over HTTPS (`abfss://<container>@<account>.dfs.core.windows.net/`).
 - **Modern Security Architecture:** Access is governed via **Unity Catalog External Locations** backed by **Azure Managed Identities**. Compute clusters never hold raw storage keys or SAS tokens.
 - **Direct Cloud Object Access:** Data reads stream directly from ADLS Gen2 blobs into worker memory using multi-threaded parallel HTTP GET requests.
@@ -280,7 +268,6 @@ Databricks interacts with ADLS Gen2 using the **ABFS (Azure Blob File System) dr
 
 ### Q78: How will you design a Data Warehouse? Where will you use SCD Type 1 and SCD Type 2?
 
-**Direct 30-Second Answer:**
 Design a Kimball dimensional model (Star Schema) on top of the Lakehouse Gold layer:
 - **Fact Tables:** Numerical metrics and transactional events (e.g., `fact_orders`, `fact_payments`) keyed by integer surrogate date/entity keys.
 - **Dimension Tables:** Contextual business entities (e.g., `dim_customer`, `dim_product`).
@@ -342,7 +329,6 @@ flowchart LR
 
 ### Q83: Explain Autoscaling & VM sizing.
 
-**Direct 30-Second Answer:**
 - **Autoscaling:** Databricks evaluates cluster load based on executor shuffle queue backlog and CPU utilization. If queued tasks exceed executor capacity, it requests additional VMs; when idle, it scales down.
 - **VM Sizing Strategy:**
   - *Storage-to-RAM Ratio:* For shuffle-heavy ETL, select memory-optimized VMs (e.g. `Standard_E8ds_v5` - 8 cores, 64GB RAM).
@@ -372,7 +358,6 @@ flowchart LR
 
 ### Q86: Explain Init scripts.
 
-**Direct 30-Second Answer:**
 Init scripts are shell scripts that execute during cluster startup *before* the Spark driver and executor JVMs initialize.
 - **Common Use Cases:** Installing custom operating system packages (`apt-get install unixodbc`), configuring security certificates, setting custom JVM parameters, and tuning OS-level kernel network buffers.
 - **Modern Security Best Practice:** Store init scripts in **Unity Catalog Volumes** (`/Volumes/catalog/schema/volume/init.sh`) or workspace files, completely deprecating insecure DBFS root init scripts.
@@ -391,7 +376,6 @@ Delta Lake stores all table transaction history inside a hidden `_delta_log/` di
 
 ### Q88: What is Time Travel & retention (`VACUUM`)?
 
-**Direct 30-Second Answer:**
 - **Time Travel:** Delta Lake allows querying earlier states of a table using transaction log versioning or timestamps:
   ```sql
   SELECT * FROM orders VERSION AS OF 14;
@@ -407,7 +391,6 @@ Delta Lake stores all table transaction history inside a hidden `_delta_log/` di
 
 ### Q89: Optimistic Concurrency Control (OCC) in Delta Lake.
 
-**Direct 30-Second Answer:**
 Delta Lake handles concurrent transactions without locking the entire table:
 1. **Record Read Version:** Transaction reads table state at version $V_0$.
 2. **Execute In-Memory:** Changes are computed and new Parquet files are written optimistically to storage.

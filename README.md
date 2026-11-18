@@ -2,7 +2,7 @@
 
 A comprehensive, production-tested reference manual and interview defense playbook for Data Engineers, Lakehouse Architects, and Big Data Leads. 
 
-This repository provides original technical explanations, production code implementations (SQL, PySpark, Python), performance triage runbooks, and enterprise system designs spanning modern lakehouse platforms and distributed data systems.
+This repository provides original technical explanations, production code implementations (SQL, PySpark, Python), performance triage runbooks, and enterprise system designs across **495 problems and interview questions**.
 
 ---
 
@@ -10,7 +10,7 @@ This repository provides original technical explanations, production code implem
 
 ```text
 data-engineering-interview-handbook/
-├── playbooks/                        # Core Interview Defense Playbooks
+├── playbooks/                        # Core Interview Defense Playbooks (125 OCR Slides + 100 Spark Issues)
 │   ├── 100_spark_data_issues_problems_and_answers.md # 100 Real-World Spark/PySpark/SQL Data Issues
 │   ├── 01_sql_and_pyspark_125.md     # SQL & PySpark internals, Catalyst, Tungsten, GC triage
 │   ├── 02_kafka_and_streaming_125.md # Apache Kafka, EOS, and Spark Structured Streaming
@@ -20,74 +20,67 @@ data-engineering-interview-handbook/
 │   ├── 06_system_design_125.md       # High-throughput streaming, fraud detection, recovery
 │   ├── 07_managerial_leadership_125.md # Technical disputes, FinOps, team leadership
 │   └── 125_master_defense_playbook.md # Full consolidated 125-question playbook
-├── pillars/                          # 14 Knowledge Base Technical Pillars (140 Core Questions)
-│   ├── 01_spark_and_databricks.md    # Spark 3.5 engine, Catalyst, Tungsten, memory tuning
-│   ├── 02_databricks_lakehouse.md    # Unity Catalog, DABs, Serverless, Photon, Lakeflow
-│   ├── 03_modern_lakehouse.md        # Delta Lake vs Iceberg vs Hudi, Deletion Vectors
-│   ├── 04_datalake_architecture.md   # Cloud object storage, consistency, prefix scaling
+├── pillars/                          # 20 Knowledge Base Technical Pillars (270 Core Questions)
+│   ├── 01_spark_and_databricks.md    # Spark 3.5, Catalyst custom rules, Tungsten spill, Photon
+│   ├── 02_databricks_lakehouse.md    # Unity Catalog, DABs, Serverless, Lakeflow, System Tables
+│   ├── 03_modern_lakehouse.md        # Delta Lake Liquid Clustering, UniForm, Deletion Vectors
+│   ├── 04_datalake_architecture.md   # S3/ADLS prefix throttling, bin-packing, DR RPO/RTO
 │   ├── 05_apache_airflow.md          # Airflow 2/3, Dynamic Task Mapping, Deferrable Operators
-│   ├── 06_azure_data_factory.md      # SHIR architecture, VNet isolation, managed identities
-│   ├── 07_dbt_data_build_tool.md     # Incremental models, snapshots, semantic layer, mesh
-│   ├── 08_microsoft_fabric.md        # OneLake, Direct Lake mode, Shortcuts, F-SKU smoothing
-│   ├── 09_database_architecture.md   # B-Tree vs LSM, Raft/Paxos, MVCC, ARIES, sharding
-│   ├── 10_sql_server_tsql.md         # Clustered/Columnstore indexes, execution plans, RCSI
-│   ├── 11_python_for_data_engineering.md # Memory management, PyArrow, Polars, concurrency
-│   ├── 12_data_modeling_and_cdc.md   # Kimball, Data Vault 2.0, SCD 1-6, Debezium, Outbox
-│   ├── 13_power_bi_and_serving.md    # VertiPaq engine, DAX context transition, Aggregations
-│   ├── 14_system_design_at_scale.md  # Multi-tenant lakehouse, real-time ML, FinOps
-│   └── all_14_pillars_master_guide.md # Consolidated 14-pillar reference manual
+│   ├── 06_azure_data_factory.md      # SHIR HA clusters, watermark pipelines, Mapping Data Flows
+│   ├── 07_dbt_data_build_tool.md     # Incremental merge/overwrite, dbt Mesh, Semantic Layer
+│   ├── 08_microsoft_fabric.md        # OneLake Shortcuts, Direct Lake mode, Capacity Smoothing
+│   ├── 09_database_architecture.md   # B-Tree vs LSM, ARIES crash recovery, MVCC, Raft consensus
+│   ├── 10_sql_server_tsql.md         # Clustered Columnstore, parameter sniffing, partition switching
+│   ├── 11_python_for_data_engineering.md # CPython GC, PyArrow zero-copy IPC, Polars LazyFrames, PyO3
+│   ├── 12_data_modeling_and_cdc.md   # SCD 1-6, Data Vault 2.0, Debezium Outbox, Bi-Temporal
+│   ├── 13_power_bi_and_serving.md    # VertiPaq compression, DAX context transition, Aggregations
+│   ├── 14_system_design_at_scale.md  # Multi-tenant lakehouse, real-time feature store, FinOps
+│   ├── 15_apache_iceberg_deep_dive.md # Metadata tree, hidden partitioning, positional deletes, REST/Nessie
+│   ├── 16_apache_flink_streaming.md  # Chandy-Lamport barriers, RocksDB state, unaligned checkpoints
+│   ├── 17_trino_presto_duckdb.md     # Trino MPP, dynamic filtering, DuckDB SIMD embedded analytics
+│   ├── 18_genai_vector_lakehouse.md  # HNSW vs IVF-PQ, Databricks Vector Search, RAG hybrid search
+│   ├── 19_finops_compute_optimization.md # DBU tuning, Serverless cost curves, Photon ROI, spot fallback
+│   ├── 20_data_quality_contracts_observability.md # Data Contracts, streaming circuit breakers, IQR anomalies
+│   └── all_20_pillars_master_guide.md # Consolidated 20-pillar reference manual (270 questions)
 └── data/                             # Structured JSON datasets
-    ├── questions_125.json            # 125 questions with schema attributes
-    ├── questions_14_pillars.json     # 140 pillar questions
-    └── all_interview_questions.json  # Complete 265-question master dataset
+    ├── questions_125.json            # 125 OCR slide questions
+    ├── 100_spark_data_issues.json    # 100 Spark/PySpark data issue problems
+    ├── questions_20_pillars.json     # 270 pillar questions across 20 domains
+    └── all_interview_questions.json  # Complete 495-question master dataset
 ```
 
 ---
 
-## 🎯 Curriculum Pillars
+## 🎯 The 20 Technical Curriculum Pillars
 
-| # | Pillar | Topics Covered |
-| :---: | :--- | :--- |
-| **01** | **Spark & Databricks Architecture** | Catalyst optimizer lifecycle, Tungsten off-heap memory, shuffle sizing, Dynamic Partition Pruning, AQE skew join, Vectorized Pandas UDFs. |
-| **02** | **Databricks Lakehouse & Unity Catalog** | Unity Catalog 3-tier namespace, row/column masking, Databricks Asset Bundles (DABs), Serverless compute, Photon engine, Liquid Clustering. |
-| **03** | **Modern Lakehouse Table Formats** | Delta Lake 3.x vs Apache Iceberg vs Apache Hudi, Copy-on-Write vs Merge-on-Read, Deletion Vectors, UniForm multi-engine interoperability. |
-| **04** | **Data Lake Architecture & Storage** | S3/ADLS Gen2 consistency models, prefix request throttling (HTTP 503), small file compaction, disaster recovery, zero-trust perimeter. |
-| **05** | **Apache Airflow Orchestration** | Airflow 2 vs 3, Celery vs Kubernetes executors, Dynamic Task Mapping, Deferrable Operators, Custom XCom backends, High Availability. |
-| **06** | **Azure Data Factory & Integration** | High-availability SHIR clusters, private endpoints, watermark incremental patterns, API pagination, Managed Identity security. |
-| **07** | **dbt (Data Build Tool)** | Incremental strategies (`merge`, `append`, `insert_overwrite`), snapshots (SCD2), generic/singular testing, dbt Semantic Layer, dbt Mesh. |
-| **08** | **Microsoft Fabric** | OneLake logical architecture, Direct Lake mode in Power BI, OneLake Shortcuts, Lakehouse vs Warehouse, Capacity Smoothing. |
-| **09** | **Database Architecture & Systems** | Row vs Columnar storage, B-Tree vs LSM-Tree, PACELC theorem, Vitess sharding, Raft consensus, MVCC isolation, ARIES recovery. |
-| **10** | **SQL Server & T-SQL Mastery** | B-Tree leaf node architecture, Clustered Columnstore Indexes, parameter sniffing remediation, partition switching, TempDB latch contention. |
-| **11** | **Python for Data Engineering** | Reference counting and cyclic GC, generators (`yield`), GIL concurrency models, PyArrow zero-copy sharing, Polars vs Pandas 2.0. |
-| **12** | **Data Modeling & Streaming Ingestion** | Kimball vs Inmon vs Data Vault 2.0, SCD Types 1-6, Log-based CDC (Debezium), Kafka partition sizing, Transactional Outbox pattern. |
-| **13** | **Power BI, Semantic Layer & Serving** | VertiPaq compression (Value, Dictionary, RLE), DAX context transition, User-defined aggregations, Row-Level & Object-Level Security. |
-| **14** | **Enterprise System Design at Scale** | Multi-tenant lakehouse design, real-time fraud detection (< 20ms p99), 10 PB cloud migration, FinOps cost governance, incident response. |
-
----
-
-## 🛠️ Usage
-
-### Cloning and Setup
-```bash
-git clone https://github.com/santoshjammi29/data-engineering-interview-handbook.git
-cd data-engineering-interview-handbook
-```
-
-### JSON Datasets
-All questions are available in machine-readable JSON format under `data/`:
-```python
-import json
-
-with open("data/all_interview_questions.json") as f:
-    questions = json.load(f)
-
-print(f"Total questions loaded: {len(questions)}")
-# Inspect a question
-print(questions[0]["question"])
-print(questions[0]["answer"])
-```
+| # | Pillar | Questions | Key Production Topics Covered |
+| :---: | :--- | :---: | :--- |
+| **01** | **Spark & Databricks Architecture** | 15 | Catalyst optimizer rules, Tungsten off-heap memory, shuffle spill triage, AQE coalescing, RocksDB streaming, Photon C++ SIMD. |
+| **02** | **Databricks Lakehouse & Unity Catalog** | 15 | Unity Catalog 3-tier namespace, DABs GitOps, dynamic row/column masking, Serverless compute, System Tables FinOps, Lakeflow. |
+| **03** | **Modern Lakehouse Table Formats** | 15 | Delta Lake 3.x Liquid Clustering, UniForm metadata translation, Deletion Vectors Roaring Bitmaps, Shallow vs Deep Clone, OCC write conflicts. |
+| **04** | **Data Lake Architecture & Storage** | 15 | S3/ADLS Gen2 prefix request throttling (HTTP 503), small file bin-packing, DR Active-Passive RPO/RTO, Glacier tiering traps, Zero-Trust security. |
+| **05** | **Apache Airflow Orchestration** | 15 | Airflow 2 vs 3 decoupled scheduler, Dynamic Task Mapping (`.expand()`), Deferrable Operators & Triggerer daemon, Custom XCom S3 backends, Multi-Scheduler HA. |
+| **06** | **Azure Data Factory & Integration** | 15 | Self-Hosted IR (SHIR) HA clustering, watermark incremental extraction, Mapping Data Flows cluster reuse, REST OAuth2 pagination, ARM CI/CD gates. |
+| **07** | **dbt (Data Build Tool)** | 15 | Incremental strategies (`merge`, `append`, `insert_overwrite`), snapshots (SCD2), MetricFlow Semantic Layer, dbt Mesh cross-project contracts, unit tests. |
+| **08** | **Microsoft Fabric & OneLake** | 15 | OneLake Shortcuts, Power BI Direct Lake mode over Delta, Lakehouse vs Warehouse, F-SKU Capacity Smoothing, KQL Real-Time Intelligence. |
+| **09** | **Database Architecture & Systems** | 15 | B-Tree vs LSM-Tree amplification, MVCC snapshot isolation, ARIES WAL crash recovery (Analysis/Redo/Undo), distributed sharding (Vitess), Raft consensus. |
+| **10** | **SQL Server & T-SQL Mastery** | 15 | Clustered Columnstore rowgroups, parameter sniffing remediation, partition switching zero-logging, RCSI TempDB version store, DMV execution plan analysis. |
+| **11** | **Python for Data Engineering** | 15 | CPython reference counting and cyclic GC, PyArrow zero-copy IPC memory, Polars LazyFrame SIMD vectorization, asyncio vs multiprocessing, PyO3 Rust extensions. |
+| **12** | **Data Modeling & CDC** | 15 | SCD Types 1-6 complete implementations, Data Vault 2.0 hash keys, Debezium Transactional Outbox CDC, Star vs Snowflake vs OBT, Bi-Temporal financial ledgers. |
+| **13** | **Power BI & Serving Layer** | 15 | VertiPaq Value/Dict/RLE compression, DAX context transition (`CALCULATE()`), Composite Models & Aggregation Tables, XMLA partition refresh, Dynamic RLS. |
+| **14** | **System Design at Scale** | 15 | Multi-tenant lakehouse isolation, dual-storage real-time feature store (< 5ms), Lakehouse FinOps auto-scaling, CQRS event sourcing, automated lineage. |
+| **15** | **Apache Iceberg Deep Dive** | 10 | 4-tier metadata tree, hidden partitioning, positional vs equality deletes, schema evolution with Field IDs, REST/Nessie/Polaris catalogs, WAP pattern. |
+| **16** | **Apache Flink & Stateful Streaming** | 10 | JobManager/TaskManager slots, Chandy-Lamport barriers, HashMap vs RocksDB backends, unaligned checkpoints, watermark alignment, two-phase commit EOS. |
+| **17** | **Trino, Presto & DuckDB** | 10 | Trino coordinator MPP, dynamic filtering pushdown, memory pools and spill, Project Tardigrade fault tolerance, DuckDB morsel SIMD, Arrow zero-copy. |
+| **18** | **GenAI, Vector Search & Embeddings** | 10 | HNSW vs IVF-PQ indexing, Databricks Vector Search Delta sync, recursive chunking, GPU Spark embedding batches, semantic caching, hybrid search (BM25 + Dense). |
+| **19** | **FinOps & Cost Engineering** | 10 | DBU cost reduction checklist, Serverless vs Classic compute cost curves, Photon ROI profiling, S3 multipart aborts, BigQuery slots vs on-demand, Spot fallback. |
+| **20** | **Data Quality, Contracts & Observability** | 10 | Data Contracts YAML specification, streaming circuit breakers, 5 pillars of observability, statistical IQR anomaly detection, CDC automated checksum reconciliation. |
+| **Σ** | **TOTAL** | **495** | **Complete Full-Stack Data Engineering & Lakehouse Architecture Mastery** |
 
 ---
 
-## 📄 License
-MIT License. Free for educational and professional preparation purposes.
+## ⚡ Master Playbooks
+
+- 📖 **[100 Spark, PySpark & SQL Data Issue Problems & Solutions](playbooks/100_spark_data_issues_problems_and_answers.md)**
+- 📖 **[125 Master Technical Defense Playbook](playbooks/125_master_defense_playbook.md)**
+- 📖 **[All 20 Technical Pillars Master Guide](pillars/all_20_pillars_master_guide.md)**

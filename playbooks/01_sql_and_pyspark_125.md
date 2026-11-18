@@ -2,7 +2,6 @@
 
 ### Q1: Return matching records from 2 tables which also contain Null values.
 
-**Direct 30-Second Answer:**
 Standard SQL `=` and `<>` operators operate on three-valued logic (`TRUE`, `FALSE`, `UNKNOWN`). When comparing two `NULL` values using `=`, the result is `UNKNOWN`, which evaluates to `FALSE` in join filters. To match records where both sides contain `NULL`, you must use **null-safe equality**:
 - **ANSI SQL-99:** `ON a.col IS NOT DISTINCT FROM b.col`
 - **Spark SQL / Databricks / Hive:** `ON a.col <=> b.col`
@@ -38,7 +37,6 @@ df_joined = df_a.join(df_b, df_a["customer_id"].eqNullSafe(df_b["customer_id"]),
 
 ### Q2: Return all records from Left Table which matches with Right Table.
 
-**Direct 30-Second Answer:**
 Depending on whether you need columns from the right table or want to prevent row duplication:
 1. **Inner Join:** Returns matched rows with columns from both tables. If the right table has multiple matches, the left table's rows are multiplied.
 2. **Left Semi Join (Best Practice):** Returns rows from the left table *only* where at least one match exists in the right table. It **never multiplies rows** and does not project right-table columns.
@@ -64,7 +62,6 @@ df_matched = df_transactions.join(df_active_merchants, on="merchant_id", how="le
 
 ### Q3: From a Travel history table containing User Id, City, and Travel Date, identify the source and destination city of each journey.
 
-**Direct 30-Second Answer:**
 Use analytical window functions partitioned by `user_id` and ordered by `travel_date`:
 - **Leg-by-Leg Destination:** `LEAD(city) OVER (PARTITION BY user_id ORDER BY travel_date)`
 - **Overall Origin & Destination:** `FIRST_VALUE(city)` and `LAST_VALUE(city)` with explicit window frames.
@@ -100,7 +97,6 @@ FROM travel_history;
 
 ### Q4: Find 4th highest salary for each department.
 
-**Direct 30-Second Answer:**
 Use `DENSE_RANK()` inside a Common Table Expression (CTE) partitioned by `department_id` and ordered by `salary DESC`. `DENSE_RANK()` ensures tied salaries share the same rank without skipping numbers.
 
 **Production Code:**
@@ -140,7 +136,6 @@ df_4th = (
 
 ### Q5: What is the difference between Rank & Dense_Rank?
 
-**Direct 30-Second Answer:**
 Both assign ranks based on an ordering within a partition, but they handle ties differently:
 - **`RANK()`:** Produces gaps in rank sequence after ties. If two rows tie for rank 1, the next rank assigned is 3 (Sequence: 1, 1, 3, 4).
 - **`DENSE_RANK()`:** Never produces gaps in rank sequence after ties. If two rows tie for rank 1, the next rank assigned is 2 (Sequence: 1, 1, 2, 3).
@@ -158,7 +153,6 @@ Both assign ranks based on an ordering within a partition, but they handle ties 
 
 ### Q6: From a large dataset having duplicate records, keep only latest records.
 
-**Direct 30-Second Answer:**
 In analytical SQL or PySpark, use `ROW_NUMBER()` partitioned by the natural business key and ordered by the event/update timestamp descending, filtering for `rn = 1`. In Delta Lake, use `MERGE INTO` or Delta's Change Data Feed (CDF).
 
 **Production Code (PySpark):**
@@ -194,7 +188,6 @@ WHEN NOT MATCHED THEN
 
 ### Q7: Count Null values first column wise and then row wise.
 
-**Direct 30-Second Answer:**
 - **Column-wise:** Use aggregated conditional counts (`COUNT(CASE WHEN col IS NULL THEN 1 END)` or `sum(col.isNull.cast('int'))` for every column).
 - **Row-wise:** Compute the sum of boolean null checks across columns for each record.
 
@@ -222,7 +215,6 @@ df_with_row_nulls.filter(F.col("row_null_count") > 0).show()
 
 ### Q8: How do you handle JSON Data?
 
-**Direct 30-Second Answer:**
 Never use string manipulation or Python regex. In PySpark:
 1. Define a strict schema using `StructType` or DDL string.
 2. Use `from_json(col, schema)` to parse JSON strings into typed structs in a single vectorized pass.
@@ -261,7 +253,6 @@ df_parsed = (
 
 ### Q9: How do you handle a slow Spark job?
 
-**Direct 30-Second Answer:**
 Follow a structured 5-step Spark UI triage methodology:
 1. **Locate the Bottleneck Stage:** Open Spark UI -> Stages tab. Identify stages with 90%+ duration.
 2. **Detect Data Skew:** Look at Task Duration, Shuffle Read Size, and Input Size across Min, 25th, Median, 75th, and Max. If Max is 10x+ higher than Median, data skew is present.
@@ -273,7 +264,6 @@ Follow a structured 5-step Spark UI triage methodology:
 
 ### Q10: How do you optimize a slow SQL query?
 
-**Direct 30-Second Answer:**
 1. **Predicate Pushdown & SARGability:** Ensure `WHERE` clauses are Search Argument Able (avoid `WHERE YEAR(date) = 2024`, use `WHERE date >= '2024-01-01' AND date < '2025-01-01'`).
 2. **Partition Pruning & File Skipping:** Filter on partition or cluster keys to avoid reading unnecessary Parquet files.
 3. **Column Projection:** Eliminate `SELECT *`. Parquet is columnar; reading only required columns drastically reduces network and memory I/O.
@@ -284,7 +274,6 @@ Follow a structured 5-step Spark UI triage methodology:
 
 ### Q11: Why can a job still be slow even after filtering 80% of data?
 
-**Direct 30-Second Answer:**
 1. **Full Table Scan (Filter Not Pushed Down):** The filter was applied on a non-partitioned, non-clustered, or calculated column, forcing Spark to scan 100% of underlying Parquet files from storage.
 2. **Data Skew in the Remaining 20%:** The filtered 20% contains a massive key skew (e.g. 90% of rows belong to `merchant_id = 'AMAZON'`), causing a single executor task to run for hours.
 3. **Downstream Wide Shuffle:** A wide transformation (`GROUP BY`, `JOIN`, `DISTINCT`) occurs after the filter, shuffling data with a suboptimal partition count (`spark.sql.shuffle.partitions = 200` default creates 200 small tasks or massive spilled partitions).
@@ -294,7 +283,6 @@ Follow a structured 5-step Spark UI triage methodology:
 
 ### Q12: How does Spark optimize filters on Delta tables?
 
-**Direct 30-Second Answer:**
 Delta Lake integrates tightly with the Catalyst Optimizer through 4 core mechanisms:
 1. **Metadata Data Skipping:** Delta collects column-level statistics (min, max, null count) for the first 32 columns in the table transaction log (`_delta_log`). If a filter `WHERE age > 65` is applied, Delta skips Parquet files where `max(age) <= 65` entirely without reading disk.
 2. **Partition Pruning:** Hive-style partition directories are pruned directly via the transaction log.
@@ -305,7 +293,6 @@ Delta Lake integrates tightly with the Catalyst Optimizer through 4 core mechani
 
 ### Q13: What happens internally during repartition?
 
-**Direct 30-Second Answer:**
 `repartition(N)` triggers a full physical shuffle exchange (`ShuffleExchangeExec`):
 1. **Map Phase:** Each executor maps incoming records through a Round-Robin or Hash partitioner:
    $$\text{partition\_id} = \text{hash}(key) \pmod N$$
@@ -317,7 +304,6 @@ Delta Lake integrates tightly with the Catalyst Optimizer through 4 core mechani
 
 ### Q14: How would you handle a skew during production?
 
-**Direct 30-Second Answer:**
 1. **Enable Spark 3.0+ AQE Skew Join:** Set `spark.sql.adaptive.enabled = true` and `spark.sql.adaptive.skewJoin.enabled = true`. AQE detects when a partition exceeds `spark.sql.adaptive.skewJoin.skewedPartitionFactor * median` and automatically splits the skewed partition into smaller sub-partitions.
 2. **Salting Technique:** If AQE cannot resolve it (e.g., in complex non-equi joins or custom aggregations):
    - Add a salted key: `salted_key = concat(skewed_key, '_', floor(rand() * 10))`
@@ -329,7 +315,6 @@ Delta Lake integrates tightly with the Catalyst Optimizer through 4 core mechani
 
 ### Q15: How do you remove Duplicates?
 
-**Direct 30-Second Answer:**
 In PySpark, use `df.dropDuplicates()` (or `df.dropDuplicates(["col1", "col2"])` for key-based deduplication), or in SQL use `SELECT DISTINCT`.
 When duplicate records share identical values across all columns, Spark triggers a hash aggregate across all fields to drop duplicates.
 
@@ -346,7 +331,6 @@ df_unique_customers = df.dropDuplicates(["customer_id", "email"])
 
 ### Q16: What if Duplicates have different timestamps?
 
-**Direct 30-Second Answer:**
 When duplicate business records have different update or ingestion timestamps, simple `dropDuplicates()` is non-deterministic. To reliably keep the latest record, use an analytical window with `ROW_NUMBER() OVER (PARTITION BY natural_keys ORDER BY event_timestamp DESC)` and filter for `row_num = 1`.
 
 **Production Code:**
@@ -407,7 +391,6 @@ df_dept_stats = (
 
 ### Q18: Find moving average sales for 3 Days (Friday, Saturday and Sunday) in a quarter.
 
-**Direct 30-Second Answer:**
 1. Filter dates where `DAYOFWEEK(date_col) IN (6, 7, 1)` (Friday, Saturday, Sunday in standard ANSI Sunday=1 convention).
 2. Calculate the moving average using a window frame: `AVG(sales) OVER (PARTITION BY quarter ORDER BY sales_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)`.
 
@@ -459,7 +442,6 @@ GROUP BY
 
 ### Q20: How do you calculate transaction volume for a merchant?
 
-**Direct 30-Second Answer:**
 Group by `merchant_id` (and time period if needed) and calculate both total count of transactions and gross monetary volume.
 
 **Production SQL:**
@@ -477,7 +459,6 @@ GROUP BY merchant_id;
 
 ### Q21: Calculate Daily Cumulative Balance for merchant?
 
-**Direct 30-Second Answer:**
 Aggregate daily net change per merchant, then apply an analytical cumulative window sum ordered by `txn_date` with `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`.
 
 **Production SQL:**
@@ -526,7 +507,6 @@ WHERE rank_position <= 3;
 
 ### Q23: How do you handle Fault Tolerance using Spark?
 
-**Direct 30-Second Answer:**
 Spark achieves fault tolerance through **RDD Lineage Graphs (Lazy Evaluation)** and **Deterministic Recomputation**:
 1. **Worker / Executor Loss:** Executors are stateless computation workers. If an executor dies, the Driver detects heartbeat loss, asks cluster manager (K8s/YARN) for a new executor, and replays the DAG lineage only for the lost partitions.
 2. **Shuffle Fetch Failure:** If an executor hosting shuffle map files crashes, a downstream task raises `FetchFailedException`. The Driver restarts the upstream map stage to regenerate the lost shuffle files.
@@ -536,7 +516,6 @@ Spark achieves fault tolerance through **RDD Lineage Graphs (Lazy Evaluation)** 
 
 ### Q24: What is the difference between Job, Stage and Task? How does Spark decide number of tasks per stage?
 
-**Direct 30-Second Answer:**
 - **Job:** Created whenever an **Action** (`collect()`, `count()`, `write()`, `saveAsTable()`) is invoked on a DataFrame.
 - **Stage:** Created at each **Shuffle Boundary** (Wide Transformation). A Job consists of one or more sequential or parallel Stages.
 - **Task:** The smallest atomic execution unit. Runs on a single CPU core over a single partition of data inside an Executor.
@@ -562,7 +541,6 @@ Spark achieves fault tolerance through **RDD Lineage Graphs (Lazy Evaluation)** 
 
 ### Q26: Explain all types of Join with a simple use case.
 
-**Direct 30-Second Answer:**
 1. **Inner Join:** Retains only keys present in both tables (e.g., active orders with customer profiles).
 2. **Left Outer Join:** Retains all left records, filling right columns with `NULL` if missing (e.g., all customers and their optional loyalty discounts).
 3. **Right Outer Join:** Retains all right records (rare in production; converted to Left Outer).
@@ -575,7 +553,6 @@ Spark achieves fault tolerance through **RDD Lineage Graphs (Lazy Evaluation)** 
 
 ### Q27: How do you execute PySpark code on a cluster?
 
-**Direct 30-Second Answer:**
 1. **Execution Modes:**
    - **Client Mode:** Driver runs locally on the machine executing `spark-submit` (e.g., interactive notebook, Edge node). Used for debugging.
    - **Cluster Mode:** Driver runs inside an Application Master container on one of the worker nodes in the cluster. Used for production scheduled batch jobs.
@@ -598,7 +575,6 @@ spark-submit \
 
 ### Q28: How do you decide cluster configuration for your PySpark job?
 
-**Direct 30-Second Answer:**
 Use the **3-Pillar Sizing Methodology** based on data volume, core-to-memory ratio, and YARN/K8s overhead:
 1. **Rule of Thumb for Memory:** Size total cluster RAM to $2\times$ to $3\times$ the uncompressed raw dataset size to prevent disk spill during wide shuffles.
 2. **Cores per Executor:** Allocate **4 to 5 cores per executor**.
@@ -611,7 +587,6 @@ Use the **3-Pillar Sizing Methodology** based on data volume, core-to-memory rat
 
 ### Q29: How do you Debug a failed Spark job?
 
-**Direct 30-Second Answer:**
 Execute a 4-step root-cause isolation workflow:
 1. **Identify the Failure Stage in Spark UI:** Determine if failure happened at data ingestion, join shuffle, or write phase.
 2. **Inspect Driver vs Executor Logs:**
@@ -691,7 +666,6 @@ df_highest_salary = (
 
 ### Q33: Find duplicate records in a DataFrame and remove them.
 
-**Direct 30-Second Answer:**
 To identify duplicates before dropping, use `groupBy()` with `count()` filtering `count > 1`. To remove them, use `df.dropDuplicates(["key1", "key2"])`.
 
 **Production Code:**
@@ -712,7 +686,6 @@ df_clean = df_orders.dropDuplicates(["order_id", "customer_id"])
 
 ### Q34: How do you apply Join on 3 columns.
 
-**Direct 30-Second Answer:**
 In PySpark, pass a Python list of column names to the `on` parameter, or use explicit equality expressions combined with `&` (bitwise AND).
 
 **Production Code:**
@@ -738,7 +711,6 @@ df_joined = df_orders.join(
 
 ### Q35: Explain SCD Type 2 with a use-case.
 
-**Direct 30-Second Answer:**
 Slowly Changing Dimension (SCD) Type 2 tracks complete historical changes by creating a new record every time an attribute updates, preserving full audit history. Columns required:
 - `surrogate_key` (e.g. Hash of `natural_key + valid_from`)
 - `natural_key` (e.g. `customer_id`)
@@ -794,7 +766,6 @@ GROUP BY user_id;
 
 ### Q37: Identify and flag a user who undergoes 3 transactions within 60 seconds.
 
-**Direct 30-Second Answer:**
 Use the `LAG(event_timestamp, 2)` analytical window function partitioned by `user_id` and ordered by `event_timestamp`. Comparing the current transaction's timestamp with the timestamp from 2 transactions ago identifies whether 3 consecutive events occurred within $\le 60\text{ seconds}$.
 
 **Production SQL:**
@@ -824,7 +795,6 @@ WHERE ts_2_txns_ago IS NOT NULL
 
 ### Q38: How do you optimize transformations in PySpark?
 
-**Direct 30-Second Answer:**
 1. **Replace Python UDFs with Native Functions:** Native Spark functions execute directly in the JVM via Catalyst with Whole-Stage CodeGen, avoiding expensive Python-JVM serialization. If custom logic is required, use Vectorized Pandas UDFs (PyArrow).
 2. **Predicate Pushdown & Early Projection:** Filter rows and select columns as early as possible before any join or aggregation.
 3. **Strategic Caching (`persist()`):** Cache intermediate DataFrames *only* if they are referenced multiple times in downstream branches. Always use `StorageLevel.MEMORY_AND_DISK_SER` and `unpersist()` when complete.
@@ -883,7 +853,6 @@ flowchart TD
 
 ### Q42: Brief about Spark 3.0 features (Adaptive Query Execution and Auto skew handling).
 
-**Direct 30-Second Answer:**
 Adaptive Query Execution (AQE) dynamically re-optimizes query plans during runtime using post-shuffle partition statistics:
 1. **Dynamically Coalescing Shuffle Partitions:** Replaces static `spark.sql.shuffle.partitions` by merging small shuffle partitions into target sizes (default 64MB).
 2. **Dynamically Switching Join Strategies:** If runtime statistics reveal that a table's actual filtered size is $< 10\text{MB}$, AQE automatically converts a Sort-Merge Join to a Broadcast Hash Join.
@@ -914,7 +883,6 @@ Adaptive Query Execution (AQE) dynamically re-optimizes query plans during runti
 
 ### Q45: Explain Window / analytical functions.
 
-**Direct 30-Second Answer:**
 Window functions perform calculations across a set of table rows related to the current row, without collapsing rows into a single summary row like `GROUP BY`.
 - **Ranking Functions:** `ROW_NUMBER()`, `RANK()`, `DENSE_RANK()`, `NTILE(n)`.
 - **Value Functions:** `LEAD()`, `LAG()`, `FIRST_VALUE()`, `LAST_VALUE()`.
@@ -951,7 +919,6 @@ Window functions perform calculations across a set of table rows related to the 
 
 ### Q48: Memory management and JVM GC behaviour.
 
-**Direct 30-Second Answer:**
 Spark partitions executor memory into **On-Heap** and **Off-Heap (Tungsten)**:
 $$\text{Executor Memory} = \text{Reserved (300MB)} + \text{Spark Memory (75%)} + \text{User Memory (25%)}$$
 - **Spark Memory (75%):** Shared dynamically between **Execution Memory** (shuffles, hash joins, sorting) and **Storage Memory** (cached DataFrames, broadcast variables). Execution memory has eviction priority over storage memory.
@@ -962,7 +929,6 @@ $$\text{Executor Memory} = \text{Reserved (300MB)} + \text{Spark Memory (75%)} +
 
 ### Q49: Interpret GC logs and identify memory pressure issues.
 
-**Direct 30-Second Answer:**
 1. **GC Pause Ratio:** If GC time in the Spark UI exceeds **10% of total task time**, the cluster is under severe memory pressure.
 2. **Evacuation Failure (`to-space exhausted`):** Occurs when the survivor space cannot accommodate live objects, causing expensive stop-the-world pauses.
 3. **Humongous Allocations:** Objects exceeding 50% of a G1GC region bypass young generation and are allocated directly in Old Generation, triggering premature Full GCs.
@@ -972,7 +938,6 @@ $$\text{Executor Memory} = \text{Reserved (300MB)} + \text{Spark Memory (75%)} +
 
 ### Q50: What is DAG creation and explain task execution.
 
-**Direct 30-Second Answer:**
 1. **DAG Creation:** As transformations are declared, Spark builds an internal Directed Acyclic Graph representing the lineage of RDD operations. When an action is called, the `DAGScheduler` splits the DAG into **Stages** wherever wide shuffle boundaries occur.
 2. **Task Creation:** Each Stage is converted into a `TaskSet`. The number of tasks equals the number of partitions in that stage.
 3. **Task Execution:** The `TaskScheduler` sends serialized task definitions over RPC to available Executor worker threads. Executors deserialize the bytecode, run whole-stage code-generated Java loops over partition records, write shuffle output or final storage files, and send task completion metrics back to the Driver.

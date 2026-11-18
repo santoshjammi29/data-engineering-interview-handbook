@@ -33,7 +33,6 @@ This manual delivers production-grade, battle-tested solutions for all **125 cor
 
 ### Q1: Return matching records from 2 tables which also contain Null values.
 
-**Direct 30-Second Answer:**
 Standard SQL `=` and `<>` operators operate on three-valued logic (`TRUE`, `FALSE`, `UNKNOWN`). When comparing two `NULL` values using `=`, the result is `UNKNOWN`, which evaluates to `FALSE` in join filters. To match records where both sides contain `NULL`, you must use **null-safe equality**:
 - **ANSI SQL-99:** `ON a.col IS NOT DISTINCT FROM b.col`
 - **Spark SQL / Databricks / Hive:** `ON a.col <=> b.col`
@@ -69,7 +68,6 @@ df_joined = df_a.join(df_b, df_a["customer_id"].eqNullSafe(df_b["customer_id"]),
 
 ### Q2: Return all records from Left Table which matches with Right Table.
 
-**Direct 30-Second Answer:**
 Depending on whether you need columns from the right table or want to prevent row duplication:
 1. **Inner Join:** Returns matched rows with columns from both tables. If the right table has multiple matches, the left table's rows are multiplied.
 2. **Left Semi Join (Best Practice):** Returns rows from the left table *only* where at least one match exists in the right table. It **never multiplies rows** and does not project right-table columns.
@@ -95,7 +93,6 @@ df_matched = df_transactions.join(df_active_merchants, on="merchant_id", how="le
 
 ### Q3: From a Travel history table containing User Id, City, and Travel Date, identify the source and destination city of each journey.
 
-**Direct 30-Second Answer:**
 Use analytical window functions partitioned by `user_id` and ordered by `travel_date`:
 - **Leg-by-Leg Destination:** `LEAD(city) OVER (PARTITION BY user_id ORDER BY travel_date)`
 - **Overall Origin & Destination:** `FIRST_VALUE(city)` and `LAST_VALUE(city)` with explicit window frames.
@@ -131,7 +128,6 @@ FROM travel_history;
 
 ### Q4: Find 4th highest salary for each department.
 
-**Direct 30-Second Answer:**
 Use `DENSE_RANK()` inside a Common Table Expression (CTE) partitioned by `department_id` and ordered by `salary DESC`. `DENSE_RANK()` ensures tied salaries share the same rank without skipping numbers.
 
 **Production Code:**
@@ -171,7 +167,6 @@ df_4th = (
 
 ### Q5: What is the difference between Rank & Dense_Rank?
 
-**Direct 30-Second Answer:**
 Both assign ranks based on an ordering within a partition, but they handle ties differently:
 - **`RANK()`:** Produces gaps in rank sequence after ties. If two rows tie for rank 1, the next rank assigned is 3 (Sequence: 1, 1, 3, 4).
 - **`DENSE_RANK()`:** Never produces gaps in rank sequence after ties. If two rows tie for rank 1, the next rank assigned is 2 (Sequence: 1, 1, 2, 3).
@@ -189,7 +184,6 @@ Both assign ranks based on an ordering within a partition, but they handle ties 
 
 ### Q6: From a large dataset having duplicate records, keep only latest records.
 
-**Direct 30-Second Answer:**
 In analytical SQL or PySpark, use `ROW_NUMBER()` partitioned by the natural business key and ordered by the event/update timestamp descending, filtering for `rn = 1`. In Delta Lake, use `MERGE INTO` or Delta's Change Data Feed (CDF).
 
 **Production Code (PySpark):**
@@ -225,7 +219,6 @@ WHEN NOT MATCHED THEN
 
 ### Q7: Count Null values first column wise and then row wise.
 
-**Direct 30-Second Answer:**
 - **Column-wise:** Use aggregated conditional counts (`COUNT(CASE WHEN col IS NULL THEN 1 END)` or `sum(col.isNull.cast('int'))` for every column).
 - **Row-wise:** Compute the sum of boolean null checks across columns for each record.
 
@@ -253,7 +246,6 @@ df_with_row_nulls.filter(F.col("row_null_count") > 0).show()
 
 ### Q8: How do you handle JSON Data?
 
-**Direct 30-Second Answer:**
 Never use string manipulation or Python regex. In PySpark:
 1. Define a strict schema using `StructType` or DDL string.
 2. Use `from_json(col, schema)` to parse JSON strings into typed structs in a single vectorized pass.
@@ -292,7 +284,6 @@ df_parsed = (
 
 ### Q9: How do you handle a slow Spark job?
 
-**Direct 30-Second Answer:**
 Follow a structured 5-step Spark UI triage methodology:
 1. **Locate the Bottleneck Stage:** Open Spark UI -> Stages tab. Identify stages with 90%+ duration.
 2. **Detect Data Skew:** Look at Task Duration, Shuffle Read Size, and Input Size across Min, 25th, Median, 75th, and Max. If Max is 10x+ higher than Median, data skew is present.
@@ -304,7 +295,6 @@ Follow a structured 5-step Spark UI triage methodology:
 
 ### Q10: How do you optimize a slow SQL query?
 
-**Direct 30-Second Answer:**
 1. **Predicate Pushdown & SARGability:** Ensure `WHERE` clauses are Search Argument Able (avoid `WHERE YEAR(date) = 2024`, use `WHERE date >= '2024-01-01' AND date < '2025-01-01'`).
 2. **Partition Pruning & File Skipping:** Filter on partition or cluster keys to avoid reading unnecessary Parquet files.
 3. **Column Projection:** Eliminate `SELECT *`. Parquet is columnar; reading only required columns drastically reduces network and memory I/O.
@@ -315,7 +305,6 @@ Follow a structured 5-step Spark UI triage methodology:
 
 ### Q11: Why can a job still be slow even after filtering 80% of data?
 
-**Direct 30-Second Answer:**
 1. **Full Table Scan (Filter Not Pushed Down):** The filter was applied on a non-partitioned, non-clustered, or calculated column, forcing Spark to scan 100% of underlying Parquet files from storage.
 2. **Data Skew in the Remaining 20%:** The filtered 20% contains a massive key skew (e.g. 90% of rows belong to `merchant_id = 'AMAZON'`), causing a single executor task to run for hours.
 3. **Downstream Wide Shuffle:** A wide transformation (`GROUP BY`, `JOIN`, `DISTINCT`) occurs after the filter, shuffling data with a suboptimal partition count (`spark.sql.shuffle.partitions = 200` default creates 200 small tasks or massive spilled partitions).
@@ -325,7 +314,6 @@ Follow a structured 5-step Spark UI triage methodology:
 
 ### Q12: How does Spark optimize filters on Delta tables?
 
-**Direct 30-Second Answer:**
 Delta Lake integrates tightly with the Catalyst Optimizer through 4 core mechanisms:
 1. **Metadata Data Skipping:** Delta collects column-level statistics (min, max, null count) for the first 32 columns in the table transaction log (`_delta_log`). If a filter `WHERE age > 65` is applied, Delta skips Parquet files where `max(age) <= 65` entirely without reading disk.
 2. **Partition Pruning:** Hive-style partition directories are pruned directly via the transaction log.
@@ -336,7 +324,6 @@ Delta Lake integrates tightly with the Catalyst Optimizer through 4 core mechani
 
 ### Q13: What happens internally during repartition?
 
-**Direct 30-Second Answer:**
 `repartition(N)` triggers a full physical shuffle exchange (`ShuffleExchangeExec`):
 1. **Map Phase:** Each executor maps incoming records through a Round-Robin or Hash partitioner:
    $$\text{partition\_id} = \text{hash}(key) \pmod N$$
@@ -348,7 +335,6 @@ Delta Lake integrates tightly with the Catalyst Optimizer through 4 core mechani
 
 ### Q14: How would you handle a skew during production?
 
-**Direct 30-Second Answer:**
 1. **Enable Spark 3.0+ AQE Skew Join:** Set `spark.sql.adaptive.enabled = true` and `spark.sql.adaptive.skewJoin.enabled = true`. AQE detects when a partition exceeds `spark.sql.adaptive.skewJoin.skewedPartitionFactor * median` and automatically splits the skewed partition into smaller sub-partitions.
 2. **Salting Technique:** If AQE cannot resolve it (e.g., in complex non-equi joins or custom aggregations):
    - Add a salted key: `salted_key = concat(skewed_key, '_', floor(rand() * 10))`
@@ -360,7 +346,6 @@ Delta Lake integrates tightly with the Catalyst Optimizer through 4 core mechani
 
 ### Q15: How do you remove Duplicates?
 
-**Direct 30-Second Answer:**
 In PySpark, use `df.dropDuplicates()` (or `df.dropDuplicates(["col1", "col2"])` for key-based deduplication), or in SQL use `SELECT DISTINCT`.
 When duplicate records share identical values across all columns, Spark triggers a hash aggregate across all fields to drop duplicates.
 
@@ -377,7 +362,6 @@ df_unique_customers = df.dropDuplicates(["customer_id", "email"])
 
 ### Q16: What if Duplicates have different timestamps?
 
-**Direct 30-Second Answer:**
 When duplicate business records have different update or ingestion timestamps, simple `dropDuplicates()` is non-deterministic. To reliably keep the latest record, use an analytical window with `ROW_NUMBER() OVER (PARTITION BY natural_keys ORDER BY event_timestamp DESC)` and filter for `row_num = 1`.
 
 **Production Code:**
@@ -438,7 +422,6 @@ df_dept_stats = (
 
 ### Q18: Find moving average sales for 3 Days (Friday, Saturday and Sunday) in a quarter.
 
-**Direct 30-Second Answer:**
 1. Filter dates where `DAYOFWEEK(date_col) IN (6, 7, 1)` (Friday, Saturday, Sunday in standard ANSI Sunday=1 convention).
 2. Calculate the moving average using a window frame: `AVG(sales) OVER (PARTITION BY quarter ORDER BY sales_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)`.
 
@@ -490,7 +473,6 @@ GROUP BY
 
 ### Q20: How do you calculate transaction volume for a merchant?
 
-**Direct 30-Second Answer:**
 Group by `merchant_id` (and time period if needed) and calculate both total count of transactions and gross monetary volume.
 
 **Production SQL:**
@@ -508,7 +490,6 @@ GROUP BY merchant_id;
 
 ### Q21: Calculate Daily Cumulative Balance for merchant?
 
-**Direct 30-Second Answer:**
 Aggregate daily net change per merchant, then apply an analytical cumulative window sum ordered by `txn_date` with `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`.
 
 **Production SQL:**
@@ -557,7 +538,6 @@ WHERE rank_position <= 3;
 
 ### Q23: How do you handle Fault Tolerance using Spark?
 
-**Direct 30-Second Answer:**
 Spark achieves fault tolerance through **RDD Lineage Graphs (Lazy Evaluation)** and **Deterministic Recomputation**:
 1. **Worker / Executor Loss:** Executors are stateless computation workers. If an executor dies, the Driver detects heartbeat loss, asks cluster manager (K8s/YARN) for a new executor, and replays the DAG lineage only for the lost partitions.
 2. **Shuffle Fetch Failure:** If an executor hosting shuffle map files crashes, a downstream task raises `FetchFailedException`. The Driver restarts the upstream map stage to regenerate the lost shuffle files.
@@ -567,7 +547,6 @@ Spark achieves fault tolerance through **RDD Lineage Graphs (Lazy Evaluation)** 
 
 ### Q24: What is the difference between Job, Stage and Task? How does Spark decide number of tasks per stage?
 
-**Direct 30-Second Answer:**
 - **Job:** Created whenever an **Action** (`collect()`, `count()`, `write()`, `saveAsTable()`) is invoked on a DataFrame.
 - **Stage:** Created at each **Shuffle Boundary** (Wide Transformation). A Job consists of one or more sequential or parallel Stages.
 - **Task:** The smallest atomic execution unit. Runs on a single CPU core over a single partition of data inside an Executor.
@@ -593,7 +572,6 @@ Spark achieves fault tolerance through **RDD Lineage Graphs (Lazy Evaluation)** 
 
 ### Q26: Explain all types of Join with a simple use case.
 
-**Direct 30-Second Answer:**
 1. **Inner Join:** Retains only keys present in both tables (e.g., active orders with customer profiles).
 2. **Left Outer Join:** Retains all left records, filling right columns with `NULL` if missing (e.g., all customers and their optional loyalty discounts).
 3. **Right Outer Join:** Retains all right records (rare in production; converted to Left Outer).
@@ -606,7 +584,6 @@ Spark achieves fault tolerance through **RDD Lineage Graphs (Lazy Evaluation)** 
 
 ### Q27: How do you execute PySpark code on a cluster?
 
-**Direct 30-Second Answer:**
 1. **Execution Modes:**
    - **Client Mode:** Driver runs locally on the machine executing `spark-submit` (e.g., interactive notebook, Edge node). Used for debugging.
    - **Cluster Mode:** Driver runs inside an Application Master container on one of the worker nodes in the cluster. Used for production scheduled batch jobs.
@@ -629,7 +606,6 @@ spark-submit \
 
 ### Q28: How do you decide cluster configuration for your PySpark job?
 
-**Direct 30-Second Answer:**
 Use the **3-Pillar Sizing Methodology** based on data volume, core-to-memory ratio, and YARN/K8s overhead:
 1. **Rule of Thumb for Memory:** Size total cluster RAM to $2\times$ to $3\times$ the uncompressed raw dataset size to prevent disk spill during wide shuffles.
 2. **Cores per Executor:** Allocate **4 to 5 cores per executor**.
@@ -642,7 +618,6 @@ Use the **3-Pillar Sizing Methodology** based on data volume, core-to-memory rat
 
 ### Q29: How do you Debug a failed Spark job?
 
-**Direct 30-Second Answer:**
 Execute a 4-step root-cause isolation workflow:
 1. **Identify the Failure Stage in Spark UI:** Determine if failure happened at data ingestion, join shuffle, or write phase.
 2. **Inspect Driver vs Executor Logs:**
@@ -722,7 +697,6 @@ df_highest_salary = (
 
 ### Q33: Find duplicate records in a DataFrame and remove them.
 
-**Direct 30-Second Answer:**
 To identify duplicates before dropping, use `groupBy()` with `count()` filtering `count > 1`. To remove them, use `df.dropDuplicates(["key1", "key2"])`.
 
 **Production Code:**
@@ -743,7 +717,6 @@ df_clean = df_orders.dropDuplicates(["order_id", "customer_id"])
 
 ### Q34: How do you apply Join on 3 columns.
 
-**Direct 30-Second Answer:**
 In PySpark, pass a Python list of column names to the `on` parameter, or use explicit equality expressions combined with `&` (bitwise AND).
 
 **Production Code:**
@@ -769,7 +742,6 @@ df_joined = df_orders.join(
 
 ### Q35: Explain SCD Type 2 with a use-case.
 
-**Direct 30-Second Answer:**
 Slowly Changing Dimension (SCD) Type 2 tracks complete historical changes by creating a new record every time an attribute updates, preserving full audit history. Columns required:
 - `surrogate_key` (e.g. Hash of `natural_key + valid_from`)
 - `natural_key` (e.g. `customer_id`)
@@ -825,7 +797,6 @@ GROUP BY user_id;
 
 ### Q37: Identify and flag a user who undergoes 3 transactions within 60 seconds.
 
-**Direct 30-Second Answer:**
 Use the `LAG(event_timestamp, 2)` analytical window function partitioned by `user_id` and ordered by `event_timestamp`. Comparing the current transaction's timestamp with the timestamp from 2 transactions ago identifies whether 3 consecutive events occurred within $\le 60\text{ seconds}$.
 
 **Production SQL:**
@@ -855,7 +826,6 @@ WHERE ts_2_txns_ago IS NOT NULL
 
 ### Q38: How do you optimize transformations in PySpark?
 
-**Direct 30-Second Answer:**
 1. **Replace Python UDFs with Native Functions:** Native Spark functions execute directly in the JVM via Catalyst with Whole-Stage CodeGen, avoiding expensive Python-JVM serialization. If custom logic is required, use Vectorized Pandas UDFs (PyArrow).
 2. **Predicate Pushdown & Early Projection:** Filter rows and select columns as early as possible before any join or aggregation.
 3. **Strategic Caching (`persist()`):** Cache intermediate DataFrames *only* if they are referenced multiple times in downstream branches. Always use `StorageLevel.MEMORY_AND_DISK_SER` and `unpersist()` when complete.
@@ -914,7 +884,6 @@ flowchart TD
 
 ### Q42: Brief about Spark 3.0 features (Adaptive Query Execution and Auto skew handling).
 
-**Direct 30-Second Answer:**
 Adaptive Query Execution (AQE) dynamically re-optimizes query plans during runtime using post-shuffle partition statistics:
 1. **Dynamically Coalescing Shuffle Partitions:** Replaces static `spark.sql.shuffle.partitions` by merging small shuffle partitions into target sizes (default 64MB).
 2. **Dynamically Switching Join Strategies:** If runtime statistics reveal that a table's actual filtered size is $< 10\text{MB}$, AQE automatically converts a Sort-Merge Join to a Broadcast Hash Join.
@@ -945,7 +914,6 @@ Adaptive Query Execution (AQE) dynamically re-optimizes query plans during runti
 
 ### Q45: Explain Window / analytical functions.
 
-**Direct 30-Second Answer:**
 Window functions perform calculations across a set of table rows related to the current row, without collapsing rows into a single summary row like `GROUP BY`.
 - **Ranking Functions:** `ROW_NUMBER()`, `RANK()`, `DENSE_RANK()`, `NTILE(n)`.
 - **Value Functions:** `LEAD()`, `LAG()`, `FIRST_VALUE()`, `LAST_VALUE()`.
@@ -982,7 +950,6 @@ Window functions perform calculations across a set of table rows related to the 
 
 ### Q48: Memory management and JVM GC behaviour.
 
-**Direct 30-Second Answer:**
 Spark partitions executor memory into **On-Heap** and **Off-Heap (Tungsten)**:
 $$\text{Executor Memory} = \text{Reserved (300MB)} + \text{Spark Memory (75%)} + \text{User Memory (25%)}$$
 - **Spark Memory (75%):** Shared dynamically between **Execution Memory** (shuffles, hash joins, sorting) and **Storage Memory** (cached DataFrames, broadcast variables). Execution memory has eviction priority over storage memory.
@@ -993,7 +960,6 @@ $$\text{Executor Memory} = \text{Reserved (300MB)} + \text{Spark Memory (75%)} +
 
 ### Q49: Interpret GC logs and identify memory pressure issues.
 
-**Direct 30-Second Answer:**
 1. **GC Pause Ratio:** If GC time in the Spark UI exceeds **10% of total task time**, the cluster is under severe memory pressure.
 2. **Evacuation Failure (`to-space exhausted`):** Occurs when the survivor space cannot accommodate live objects, causing expensive stop-the-world pauses.
 3. **Humongous Allocations:** Objects exceeding 50% of a G1GC region bypass young generation and are allocated directly in Old Generation, triggering premature Full GCs.
@@ -1003,7 +969,6 @@ $$\text{Executor Memory} = \text{Reserved (300MB)} + \text{Spark Memory (75%)} +
 
 ### Q50: What is DAG creation and explain task execution.
 
-**Direct 30-Second Answer:**
 1. **DAG Creation:** As transformations are declared, Spark builds an internal Directed Acyclic Graph representing the lineage of RDD operations. When an action is called, the `DAGScheduler` splits the DAG into **Stages** wherever wide shuffle boundaries occur.
 2. **Task Creation:** Each Stage is converted into a `TaskSet`. The number of tasks equals the number of partitions in that stage.
 3. **Task Execution:** The `TaskScheduler` sends serialized task definitions over RPC to available Executor worker threads. Executors deserialize the bytecode, run whole-stage code-generated Java loops over partition records, write shuffle output or final storage files, and send task completion metrics back to the Driver.
@@ -1016,7 +981,6 @@ $$\text{Executor Memory} = \text{Reserved (300MB)} + \text{Spark Memory (75%)} +
 
 ### Q51: Explain your real time experience in Kafka.
 
-**Direct 30-Second Answer:**
 "In our production enterprise payments and telemetry lakehouse, I architected a multi-cluster Apache Kafka deployment (KRaft mode) processing over **150,000 events/second** (peaks of 250MB/sec). 
 My responsibilities included:
 1. **Topic Partition Topology:** Sizing partitions based on consumer throughput ($P = \max(T/P_{prod}, T/P_{cons})$) across 32 partitions per high-velocity topic.
@@ -1027,7 +991,6 @@ My responsibilities included:
 
 ### Q52: How do you tackle flaws and failure modes in Kafka?
 
-**Direct 30-Second Answer:**
 We tackle Kafka flaws through 4 core architectural guardrails:
 1. **Consumer Rebalance Storms:** Caused by slow processing exceeding `max.poll.interval.ms`. We migrated to the **Cooperative Sticky Assignor** (`partition.assignment.strategy = CooperativeStickyAssignor`), which incrementally reassigns only displaced partitions instead of triggering a 'stop-the-world' rebalance across all consumers.
 2. **Poison Pill Messages (Malformed Payloads):** When a deserialization error occurs, catching the exception, publishing the bad record with header metadata to a **Dead Letter Queue (DLQ)** topic, and advancing consumer offset to prevent stream blockage.
@@ -1038,7 +1001,6 @@ We tackle Kafka flaws through 4 core architectural guardrails:
 
 ### Q53: How do you ensure high throughput and low latency in Kafka?
 
-**Direct 30-Second Answer:**
 Tune producer batching, broker I/O, and consumer fetching in lockstep:
 - **Producer High-Throughput Tuning:**
   - `batch.size = 65536` (64 KB buffer per partition)
@@ -1087,7 +1049,6 @@ sequenceDiagram
 
 ### Q55: How do you handle schema evolution from Kafka to Delta Lake?
 
-**Direct 30-Second Answer:**
 1. **Confluent Schema Registry & Avro:** Enforce **BACKWARD_TRANSITIVE** or **FULL** compatibility on the Kafka topic. Producers cannot register breaking schema changes (e.g. dropping non-optional fields or changing types).
 2. **Spark Auto Loader Ingestion (`cloudFiles`):**
    ```python
@@ -1111,7 +1072,6 @@ sequenceDiagram
 
 ### Q56: Checkpointing (offsets, state, metadata).
 
-**Direct 30-Second Answer:**
 Checkpointing provides fault tolerance and end-to-end exactly-once guarantees by persisting 4 internal subdirectories on durable cloud object storage:
 1. `offsets/`: Write-Ahead Log (WAL) recording the exact starting and ending source offsets (e.g. Kafka partition offsets) for each micro-batch.
 2. `commits/`: Contains empty commit files written only after all sinks complete processing. When restarting, if an offset exists in `offsets/` but not in `commits/`, Spark replays that exact batch.
@@ -1122,7 +1082,6 @@ Checkpointing provides fault tolerance and end-to-end exactly-once guarantees by
 
 ### Q57: Watermarking & late data handling.
 
-**Direct 30-Second Answer:**
 Watermarking establishes how late incoming data can arrive relative to event-time before being discarded.
 - **Definition:** Watermark delay $T$ means Spark drops all records with event timestamp:
   $$\text{event\_time} < \max(\text{event\_time}) - T$$
@@ -1150,7 +1109,6 @@ df_streaming_agg = (
 
 ### Q58: State management across micro-batches.
 
-**Direct 30-Second Answer:**
 Stateful operations require maintaining historical state across micro-batches.
 1. **Default HDFS-Backed State Store:** Maintains the entire state map on the JVM Java heap. At scale (millions of keys), this triggers severe GC pause storms and executor OOMs.
 2. **RocksDB State Store (Databricks / Production Standard):**
@@ -1199,7 +1157,6 @@ spark.conf.set(
 
 ### Q61: How do you pass parameter from one Notebook to another Notebook?
 
-**Direct 30-Second Answer:**
 1. **`dbutils.notebook.run()` with Arguments:**
    Pass parameters as a Python dictionary to `dbutils.notebook.run("path", timeout_seconds, {"param_key": "param_val"})`.
 2. **Accessing via Databricks Widgets:**
@@ -1227,7 +1184,6 @@ spark.conf.set(
 
 ### Q62: If records are moved from source to target table and source is deleted, how do you identify deleted records? (Upsert & Delete detection)
 
-**Direct 30-Second Answer:**
 Execute a **Full Outer Join** or **Left Anti Join** between the target table and the current source snapshot:
 - **Left Anti Join:** Records existing in `target` but missing in `source` represent deleted records.
 - **Delta Lake Change Data Feed (CDF):** If CDC is enabled on the source table (`delta.enableChangeDataFeed = true`), Delta automatically tracks row-level changes with metadata columns: `_change_type = 'delete'`, `_commit_version`, `_commit_timestamp`.
@@ -1269,7 +1225,6 @@ WHEN NOT MATCHED THEN
 
 ### Q64: A Delta table has doubled in size over time. How would you optimize the performance of this Delta table?
 
-**Direct 30-Second Answer:**
 Execute a 4-step Lakehouse compaction and pruning regime:
 1. **Compaction (`OPTIMIZE`):** Merge thousands of small, fragmented files into standard 1GB files:
    ```sql
@@ -1295,7 +1250,6 @@ Execute a 4-step Lakehouse compaction and pruning regime:
 
 ### Q65: In which places have you used the Databricks ecosystem during production?
 
-**Direct 30-Second Answer:**
 1. **Data Ingestion & Bronze Landing:** Auto Loader (`cloudFiles`) for streaming ingestion of IoT, Kafka, and ERP JSON dumps into Delta Lake Bronze.
 2. **ETL & Data Quality:** Lakeflow Pipelines (Delta Live Tables - DLT) with `EXPECT` constraints for automated data quality gates in Silver cleaning.
 3. **Serving & BI:** Databricks SQL (DBSQL) Serverless Warehouses powered by Photon engine for Tableau and Power BI direct lakehouse queries.
@@ -1319,7 +1273,6 @@ Execute a 4-step Lakehouse compaction and pruning regime:
 
 ### Q67: Difference between Full load and Incremental load?
 
-**Direct 30-Second Answer:**
 - **Full Load:** Truncates and reloads the entire source table on every run. Simple to implement but becomes computationally prohibitive, cost-inefficient, and creates massive downtime at scale ($> 1\text{TB}$).
 - **Incremental Load:** Ingests only new, modified, or deleted records since the high-watermark timestamp or transaction commit ID of the previous run. Drastically reduces compute time, network I/O, and storage churn.
 
@@ -1367,7 +1320,6 @@ def upsert_to_delta(micro_batch_df, batch_id):
 
 ### Q69: If a Spark job is running slow on Databricks, how will you Optimize it?
 
-**Direct 30-Second Answer:**
 1. **Enable Photon Engine:** Toggle Photon on the Databricks cluster for $3\times \text{ to } 8\times$ faster vectorized C++ query execution.
 2. **Review Query Profile in Spark UI:** Identify long task stages, high spill to disk, and executor skew.
 3. **Tune Shuffle & AQE:** Verify AQE is active (`spark.sql.adaptive.enabled = true`). Adjust `spark.sql.adaptive.advisoryPartitionSizeInBytes = 67108864` (64MB).
@@ -1378,7 +1330,6 @@ def upsert_to_delta(micro_batch_df, batch_id):
 
 ### Q70: What do you mean by small file problem and how do you solve this problem?
 
-**Direct 30-Second Answer:**
 The **Small File Problem** occurs when streaming or high-frequency batch jobs write thousands of tiny Parquet files ($< 10\text{MB}$ each). Reading thousands of files causes massive cloud storage metadata overhead (millions of `GET/LIST` requests) and degrades query throughput.
 - **Solution 1 - Delta Auto Compaction & Optimized Writes:**
   ```sql
@@ -1394,7 +1345,6 @@ The **Small File Problem** occurs when streaming or high-frequency batch jobs wr
 
 ### Q71: How partitions count is decided? What will you do if partitions are too low?
 
-**Direct 30-Second Answer:**
 - **Target Partition Sizing:** Ideal partition size in Spark memory is **100 MB to 200 MB**.
   $$\text{Partitions} = \frac{\text{Total Stage Data Size}}{128\text{MB}}$$
 - **Rule of Thumb:** Total partitions should be **$2\times \text{ to } 3\times$ the number of total available CPU cores** across all cluster executors.
@@ -1406,7 +1356,6 @@ The **Small File Problem** occurs when streaming or high-frequency batch jobs wr
 
 ### Q72: How do you process a dataset of 5TB size in Databricks?
 
-**Direct 30-Second Answer:**
 1. **Cluster Topology:** Size a multi-node worker cluster (e.g. 16 workers, `Standard_E16ds_v5` with 16 vCPUs and 128 GB RAM each = 2 TB total RAM, 256 cores) with cluster autoscaling.
 2. **Photon Engine:** Enable Photon for vectorized C++ execution.
 3. **Partitioning & Liquid Clustering:** Cluster target Delta tables by primary query filters (`CLUSTER BY (country, event_date)`).
@@ -1417,7 +1366,6 @@ The **Small File Problem** occurs when streaming or high-frequency batch jobs wr
 
 ### Q73: How do you design a pipeline with the help of Databricks?
 
-**Direct 30-Second Answer:**
 Design around the **Medallion Architecture** using modern Databricks Lakeflow / Delta Live Tables (DLT):
 1. **Bronze Layer:** Stream raw ingested files into append-only Delta tables with Auto Loader (`cloudFiles`).
 2. **Silver Layer:** Apply schema expectations (`EXPECT`), parse JSON structures, scrub nulls, and deduplicate with `ROW_NUMBER()`.
@@ -1427,7 +1375,6 @@ Design around the **Medallion Architecture** using modern Databricks Lakeflow / 
 
 ### Q74: How do you integrate Databricks and Azure Data Factory?
 
-**Direct 30-Second Answer:**
 Use the native **ADF Azure Databricks Linked Service**:
 1. **Security & Identity:** Connect securely via **System-Assigned Managed Identity (SMI)** or Service Principal with secrets in Azure Key Vault.
 2. **Activity Types:** Invoke pipelines using the **Databricks Notebook Activity** or **Databricks Python Activity**.
@@ -1448,7 +1395,6 @@ Use the native **ADF Azure Databricks Linked Service**:
 
 ### Q76: How does Databricks interact with Data Lake storage (ADLS Gen2)?
 
-**Direct 30-Second Answer:**
 Databricks interacts with ADLS Gen2 using the **ABFS (Azure Blob File System) driver** over HTTPS (`abfss://<container>@<account>.dfs.core.windows.net/`).
 - **Modern Security Architecture:** Access is governed via **Unity Catalog External Locations** backed by **Azure Managed Identities**. Compute clusters never hold raw storage keys or SAS tokens.
 - **Direct Cloud Object Access:** Data reads stream directly from ADLS Gen2 blobs into worker memory using multi-threaded parallel HTTP GET requests.
@@ -1477,7 +1423,6 @@ Databricks interacts with ADLS Gen2 using the **ABFS (Azure Blob File System) dr
 
 ### Q78: How will you design a Data Warehouse? Where will you use SCD Type 1 and SCD Type 2?
 
-**Direct 30-Second Answer:**
 Design a Kimball dimensional model (Star Schema) on top of the Lakehouse Gold layer:
 - **Fact Tables:** Numerical metrics and transactional events (e.g., `fact_orders`, `fact_payments`) keyed by integer surrogate date/entity keys.
 - **Dimension Tables:** Contextual business entities (e.g., `dim_customer`, `dim_product`).
@@ -1539,7 +1484,6 @@ flowchart LR
 
 ### Q83: Explain Autoscaling & VM sizing.
 
-**Direct 30-Second Answer:**
 - **Autoscaling:** Databricks evaluates cluster load based on executor shuffle queue backlog and CPU utilization. If queued tasks exceed executor capacity, it requests additional VMs; when idle, it scales down.
 - **VM Sizing Strategy:**
   - *Storage-to-RAM Ratio:* For shuffle-heavy ETL, select memory-optimized VMs (e.g. `Standard_E8ds_v5` - 8 cores, 64GB RAM).
@@ -1569,7 +1513,6 @@ flowchart LR
 
 ### Q86: Explain Init scripts.
 
-**Direct 30-Second Answer:**
 Init scripts are shell scripts that execute during cluster startup *before* the Spark driver and executor JVMs initialize.
 - **Common Use Cases:** Installing custom operating system packages (`apt-get install unixodbc`), configuring security certificates, setting custom JVM parameters, and tuning OS-level kernel network buffers.
 - **Modern Security Best Practice:** Store init scripts in **Unity Catalog Volumes** (`/Volumes/catalog/schema/volume/init.sh`) or workspace files, completely deprecating insecure DBFS root init scripts.
@@ -1588,7 +1531,6 @@ Delta Lake stores all table transaction history inside a hidden `_delta_log/` di
 
 ### Q88: What is Time Travel & retention (`VACUUM`)?
 
-**Direct 30-Second Answer:**
 - **Time Travel:** Delta Lake allows querying earlier states of a table using transaction log versioning or timestamps:
   ```sql
   SELECT * FROM orders VERSION AS OF 14;
@@ -1604,7 +1546,6 @@ Delta Lake stores all table transaction history inside a hidden `_delta_log/` di
 
 ### Q89: Optimistic Concurrency Control (OCC) in Delta Lake.
 
-**Direct 30-Second Answer:**
 Delta Lake handles concurrent transactions without locking the entire table:
 1. **Record Read Version:** Transaction reads table state at version $V_0$.
 2. **Execute In-Memory:** Changes are computed and new Parquet files are written optimistically to storage.
@@ -1687,7 +1628,6 @@ AWS Glue is a fully managed, serverless ETL service built on Apache Spark.
 
 ### Q95: How do you orchestrate multiple ETL jobs in AWS?
 
-**Direct 30-Second Answer:**
 1. **AWS Step Functions (Serverless State Machines - Best Practice):**
    - Visual JSON/ASL (Amazon States Language) state machine that coordinates Glue jobs, Lambda functions, Athena queries, and ECS tasks.
    - Built-in error handling (`Retry` and `Catch`), exponential backoff, parallel execution branches, and human-in-the-loop task tokens.
@@ -1990,7 +1930,6 @@ flowchart LR
 
 ### Q117: How do you distribute tasks and handle disputes within team members?
 
-**Direct 30-Second Answer:**
 - **Task Distribution Framework:** Balance **Strengths**, **Growth Goals**, and **Critical Path Risk**:
   - Assign mission-critical, complex architectural blocks (e.g., custom streaming state stores, CI/CD infrastructure) to senior engineers.
   - Pair junior/mid-level engineers on complex components to accelerate knowledge transfer while assigning them independent module ownership.
@@ -2003,7 +1942,6 @@ flowchart LR
 
 ### Q118: If you face a major misalignment with a big client related to project timelines, how do you address this?
 
-**Direct 30-Second Answer:**
 1. **Immediate Transparency (No Last-Minute Surprises):** Communicate the variance as soon as risk is identified; never wait until milestone deadlines.
 2. **Deconstruct the Variance:** Present a clear, data-driven analysis of why the timeline shifted (e.g. unanticipated upstream source API rate limits, major scope additions, schema inconsistencies).
 3. **Offer Flexible Solutions (Iron Triangle):**
