@@ -98,3 +98,26 @@ data-engineering-interview-handbook/
 | **19** | **FinOps & Cost Engineering** | 10 | DBU cost reduction checklist, Serverless vs Classic compute cost curves, Photon ROI profiling, S3 multipart aborts, BigQuery slots vs on-demand, Spot fallback. | [Pillar 19](pillars/19_finops_compute_optimization.md) |
 | **20** | **Data Quality, Contracts & Observability** | 10 | Data Contracts YAML specification, streaming circuit breakers, 5 pillars of observability, statistical IQR anomaly detection, CDC automated checksum reconciliation. | [Pillar 20](pillars/20_data_quality_contracts_observability.md) |
 | **Σ** | **TOTAL** | **595** | **Complete Full-Stack Data Engineering & Lakehouse Architecture Mastery** | — |
+
+---
+
+## 🌐 The Modern Data Engineering Lakehouse Ecosystem (13 Repositories)
+
+This handbook serves as the **Architectural Defense & Interview Playbook** within the tightly coupled 13-repository Lakehouse Ecosystem:
+
+| ID | Repository | GitHub Slug | Role in Ecosystem |
+|:---:|:---|:---|:---|
+| **R01** | **Web Hub** | [`moderndataengineer`](https://github.com/santoshjammi29/moderndataengineer) | Flagship web platform (`moderndataengineer.uk`), 11,900+ searchable assets, interactive practice runner, 52 whiteboard blueprints. |
+| **R02** | **Databricks Handbook** | [`databricks-handbook`](https://github.com/santoshjammi29/databricks-handbook) | 105 Databricks production recipes, Unity Catalog, Delta Lake 3.x, Lakeflow, Serverless, DABs, FinOps runbooks. |
+| **R03** | **PySpark Handbook** | [`pyspark-handbook`](https://github.com/santoshjammi29/pyspark-handbook) | 105 PySpark code use cases, Catalyst internals, Tungsten off-heap memory, AQE tuning, Arrow UDFs, skew salting. |
+| **R04** | **SQL Handbook** | [`sql-handbook`](https://github.com/santoshjammi29/sql-handbook) | 105 SQL production exercises, query execution plans, MPP distributed joins, MVCC concurrency, cross-engine Rosetta Stone. |
+| **R05** | **dbt Handbook** | [`dbt-handbook`](https://github.com/santoshjammi29/dbt-handbook) | Production analytics engineering: dbt Mesh, Microbatch incremental strategies, schema contracts, unit tests, Semantic Layer. |
+| **R06** | **Streaming Handbook** | [`streaming-handbook`](https://github.com/santoshjammi29/streaming-handbook) | Distributed event streaming: Kafka 3.9 KRaft, Apache Flink stateful processing, RocksDB tuning, CDC Debezium, exactly-once. |
+| **R07** | **DataOps & CI/CD Handbook** | [`dataops-cicd-handbook`](https://github.com/santoshjammi29/dataops-cicd-handbook) | Platform engineering: GitOps, Terraform & Bicep IaC, Write-Audit-Publish (WAP), Data Diff testing, Slim CI state deferral. |
+| **R08** | **System Design Handbook** | [`data-system-design-handbook`](https://github.com/santoshjammi29/data-system-design-handbook) | Distributed systems architecture: Table formats (Delta, Iceberg, Hudi), catalog federation, storage clustering (Liquid, Z-Order). |
+| **R09** | **Interview Handbook** | [`data-engineering-interview-handbook`](https://github.com/santoshjammi29/data-engineering-interview-handbook) | *(You are here)* Architectural defense playbook: 20 Knowledge Pillars, 10 125-series playbooks, 595+ production questions. |
+| **R10** | **Azure Cheat Sheet** | [`azure-cheat-sheet`](https://github.com/santoshjammi29/azure-cheat-sheet) | Azure Lakehouse & Infrastructure: Microsoft Fabric OneLake, Synapse, Bicep IaC templates, 1-page & 2-page vector cheat sheets. |
+| **R11** | **Databricks Project Blueprints** | [`azure-databricks-project-blueprints`](https://github.com/santoshjammi29/azure-databricks-project-blueprints) | 3 Full-scale production reference architectures: Retail Omnichannel Lakehouse (DLT), Real-time Payments Fraud, Warehouse Cutover. |
+| **R12** | **Banking Risk Lakehouse** | [`enterprise-banking-risk-alm-lakehouse`](https://github.com/santoshjammi29/enterprise-banking-risk-alm-lakehouse) | European banking compliance (DNB, ECB, BCBS 239), IFRS 9 ECL calculations, and IRRBB ALM Monte Carlo simulations. |
+| **R13** | **Spark Experiments** | [`spark-experiments`](https://github.com/santoshjammi29/spark-experiments) | Empirical laboratory: Reproducible data skew generation (1M+ rows), two-phase salting benchmarks, query plan and DAG physical analysis. |
+

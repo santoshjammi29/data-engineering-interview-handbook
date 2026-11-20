@@ -1,0 +1,330 @@
+{
+  "repo": "data-engineering-interview-handbook",
+  "github": "santoshjammi29/data-engineering-interview-handbook",
+  "name": "Interview Handbook",
+  "role": "Architectural defense playbook: 20 Knowledge Pillars, 10 125-series playbooks, 595+ production questions",
+  "last_synced": "2026-11-20T08:25:01.799565Z",
+  "entry_count": 32,
+  "entries": [
+    {
+      "id": "data-engineering-interview-handbook-cs-spark_architecture_and_tuning_cheatsheet",
+      "type": "reference_cheatsheet",
+      "title": "Cheat Sheet: Spark Architecture And Tuning Cheatsheet",
+      "difficulty": "L200",
+      "relative_path": "cheatsheets/spark_architecture_and_tuning_cheatsheet.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-01_spark_and_databricks",
+      "type": "knowledge_pillar",
+      "title": "01 Spark And Databricks",
+      "difficulty": "L300",
+      "relative_path": "pillars/01_spark_and_databricks.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-02_databricks_lakehouse",
+      "type": "knowledge_pillar",
+      "title": "02 Databricks Lakehouse",
+      "difficulty": "L300",
+      "relative_path": "pillars/02_databricks_lakehouse.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-03_modern_lakehouse",
+      "type": "knowledge_pillar",
+      "title": "03 Modern Lakehouse",
+      "difficulty": "L300",
+      "relative_path": "pillars/03_modern_lakehouse.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-04_datalake_architecture",
+      "type": "knowledge_pillar",
+      "title": "04 Datalake Architecture",
+      "difficulty": "L300",
+      "relative_path": "pillars/04_datalake_architecture.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-05_apache_airflow",
+      "type": "knowledge_pillar",
+      "title": "05 Apache Airflow",
+      "difficulty": "L300",
+      "relative_path": "pillars/05_apache_airflow.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-06_azure_data_factory",
+      "type": "knowledge_pillar",
+      "title": "06 Azure Data Factory",
+      "difficulty": "L300",
+      "relative_path": "pillars/06_azure_data_factory.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-07_dbt_data_build_tool",
+      "type": "knowledge_pillar",
+      "title": "07 Dbt Data Build Tool",
+      "difficulty": "L300",
+      "relative_path": "pillars/07_dbt_data_build_tool.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-08_microsoft_fabric",
+      "type": "knowledge_pillar",
+      "title": "08 Microsoft Fabric",
+      "difficulty": "L300",
+      "relative_path": "pillars/08_microsoft_fabric.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-09_database_architecture",
+      "type": "knowledge_pillar",
+      "title": "09 Database Architecture",
+      "difficulty": "L300",
+      "relative_path": "pillars/09_database_architecture.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-10_sql_server_tsql",
+      "type": "knowledge_pillar",
+      "title": "10 Sql Server Tsql",
+      "difficulty": "L300",
+      "relative_path": "pillars/10_sql_server_tsql.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-11_python_for_data_engineering",
+      "type": "knowledge_pillar",
+      "title": "11 Python For Data Engineering",
+      "difficulty": "L300",
+      "relative_path": "pillars/11_python_for_data_engineering.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-12_data_modeling_and_cdc",
+      "type": "knowledge_pillar",
+      "title": "12 Data Modeling And Cdc",
+      "difficulty": "L300",
+      "relative_path": "pillars/12_data_modeling_and_cdc.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-13_power_bi_and_serving",
+      "type": "knowledge_pillar",
+      "title": "13 Power Bi And Serving",
+      "difficulty": "L300",
+      "relative_path": "pillars/13_power_bi_and_serving.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-14_system_design_at_scale",
+      "type": "knowledge_pillar",
+      "title": "14 System Design At Scale",
+      "difficulty": "L300",
+      "relative_path": "pillars/14_system_design_at_scale.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-15_apache_iceberg_deep_dive",
+      "type": "knowledge_pillar",
+      "title": "15 Apache Iceberg Deep Dive",
+      "difficulty": "L300",
+      "relative_path": "pillars/15_apache_iceberg_deep_dive.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-16_apache_flink_streaming",
+      "type": "knowledge_pillar",
+      "title": "16 Apache Flink Streaming",
+      "difficulty": "L300",
+      "relative_path": "pillars/16_apache_flink_streaming.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-17_trino_presto_duckdb",
+      "type": "knowledge_pillar",
+      "title": "17 Trino Presto Duckdb",
+      "difficulty": "L300",
+      "relative_path": "pillars/17_trino_presto_duckdb.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-18_genai_vector_lakehouse",
+      "type": "knowledge_pillar",
+      "title": "18 Genai Vector Lakehouse",
+      "difficulty": "L300",
+      "relative_path": "pillars/18_genai_vector_lakehouse.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-19_finops_compute_optimization",
+      "type": "knowledge_pillar",
+      "title": "19 Finops Compute Optimization",
+      "difficulty": "L300",
+      "relative_path": "pillars/19_finops_compute_optimization.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-20_data_quality_contracts_observability",
+      "type": "knowledge_pillar",
+      "title": "20 Data Quality Contracts Observability",
+      "difficulty": "L300",
+      "relative_path": "pillars/20_data_quality_contracts_observability.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-pillars-all_20_pillars_master_guide",
+      "type": "knowledge_pillar",
+      "title": "All 20 Pillars Master Guide",
+      "difficulty": "L300",
+      "relative_path": "pillars/all_20_pillars_master_guide.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-playbooks-01_sql_and_pyspark_125",
+      "type": "interview_playbook",
+      "title": "01 Sql And Pyspark 125",
+      "difficulty": "L300",
+      "relative_path": "playbooks/01_sql_and_pyspark_125.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-playbooks-02_kafka_and_streaming_125",
+      "type": "interview_playbook",
+      "title": "02 Kafka And Streaming 125",
+      "difficulty": "L300",
+      "relative_path": "playbooks/02_kafka_and_streaming_125.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-playbooks-03_azure_databricks_125",
+      "type": "interview_playbook",
+      "title": "03 Azure Databricks 125",
+      "difficulty": "L300",
+      "relative_path": "playbooks/03_azure_databricks_125.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-playbooks-04_aws_cloud_125",
+      "type": "interview_playbook",
+      "title": "04 Aws Cloud 125",
+      "difficulty": "L300",
+      "relative_path": "playbooks/04_aws_cloud_125.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-playbooks-05_project_defense_125",
+      "type": "interview_playbook",
+      "title": "05 Project Defense 125",
+      "difficulty": "L300",
+      "relative_path": "playbooks/05_project_defense_125.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-playbooks-06_system_design_125",
+      "type": "interview_playbook",
+      "title": "06 System Design 125",
+      "difficulty": "L300",
+      "relative_path": "playbooks/06_system_design_125.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-playbooks-07_managerial_leadership_125",
+      "type": "interview_playbook",
+      "title": "07 Managerial Leadership 125",
+      "difficulty": "L300",
+      "relative_path": "playbooks/07_managerial_leadership_125.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-playbooks-100_databricks_interview_defense_playbook",
+      "type": "interview_playbook",
+      "title": "100 Databricks Interview Defense Playbook",
+      "difficulty": "L300",
+      "relative_path": "playbooks/100_databricks_interview_defense_playbook.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-playbooks-100_spark_data_issues_problems_and_answers",
+      "type": "interview_playbook",
+      "title": "100 Spark Data Issues Problems And Answers",
+      "difficulty": "L300",
+      "relative_path": "playbooks/100_spark_data_issues_problems_and_answers.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "interview-playbooks-125_master_defense_playbook",
+      "type": "interview_playbook",
+      "title": "125 Master Defense Playbook",
+      "difficulty": "L300",
+      "relative_path": "playbooks/125_master_defense_playbook.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    }
+  ]
+}

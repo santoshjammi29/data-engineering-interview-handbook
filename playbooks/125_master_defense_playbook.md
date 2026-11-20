@@ -1,3 +1,11 @@
+> 🧭 **Modern Data Engineering Ecosystem Navigation**
+> - 📘 **Architecture & Concept:** [Data System Design — Lakehouse Architecture](https://github.com/santoshjammi29/data-system-design-handbook/tree/main/modules/01_lakehouse_and_medallion_architecture)
+> - 💻 **Hands-On Recipe:** [Databricks Handbook — Production Recipes](https://github.com/santoshjammi29/databricks-handbook)
+> - 🔬 **Empirical Lab:** [Spark Experiments — Production Benchmarks](https://github.com/santoshjammi29/spark-experiments)
+> - 🚨 **Incident Runbook:** [DataOps CI/CD Incident Runbooks](https://github.com/santoshjammi29/dataops-cicd-handbook/tree/main/runbooks)
+> - 🎯 **Interview Defense:** [Interview Defense Playbook](https://github.com/santoshjammi29/data-engineering-interview-handbook/blob/main/playbooks/125_master_defense_playbook.md) *(You are here)*
+> - 🌐 **Interactive Web Practice:** [Practice on moderndataengineer.uk](https://moderndataengineer.uk/interview)
+
 # 125 Data Engineering Master Defense Playbook & Architectural Guide
 > **Comprehensive Senior & Lead Engineer Interview Solutions, Production Code, and Architectural Blueprint**
 > *Based on the complete 125-question curriculum spanning SQL, Apache Spark, Apache Kafka, Spark Structured Streaming, Azure Databricks, Delta Lake, AWS Big Data, System Design, and Engineering Leadership.*

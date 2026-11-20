@@ -1,3 +1,11 @@
+> 🧭 **Modern Data Engineering Ecosystem Navigation**
+> - 📘 **Architecture & Concept:** [Data System Design — Data Mesh & Domain Decomposition](https://github.com/santoshjammi29/data-system-design-handbook/tree/main/modules/07_data_mesh_domain_decomposition)
+> - 💻 **Hands-On Recipe:** [dbt Handbook — Module 06: Data Contracts & Model Constraints](https://github.com/santoshjammi29/dbt-handbook/tree/main/modules/06_data_contracts_and_model_constraints)
+> - 🔬 **Empirical Lab:** [Banking Risk Lakehouse — IFRS 9 ECL DLT Pipeline](https://github.com/santoshjammi29/enterprise-banking-risk-alm-lakehouse/blob/main/src/credit_risk_ifrs9/dlt_pipeline.sql)
+> - 🚨 **Incident Runbook:** [dbt Runbook: Data Contract Violations](https://github.com/santoshjammi29/dbt-handbook/tree/main/runbooks)
+> - 🎯 **Interview Defense:** [Interview Handbook Master Guide](https://github.com/santoshjammi29/data-engineering-interview-handbook/blob/main/pillars/all_20_pillars_master_guide.md) *(You are here)*
+> - 🌐 **Interactive Web Practice:** [Practice dbt on moderndataengineer.uk](https://moderndataengineer.uk/practice/dbt)
+
 # Pillar 07: dbt (Data Build Tool) & Analytics Engineering
 **Category:** `DBT` | **Domain:** `Analytics Engineering & Transformation`
 

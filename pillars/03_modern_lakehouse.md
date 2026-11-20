@@ -1,3 +1,11 @@
+> 🧭 **Modern Data Engineering Ecosystem Navigation**
+> - 📘 **Architecture & Concept:** [Data System Design — Open Table Format Matrix](https://github.com/santoshjammi29/data-system-design-handbook/tree/main/modules/02_table_format_tradeoff_matrix)
+> - 💻 **Hands-On Recipe:** [Databricks Handbook — Notebook 03_01: Delta Lake Storage Engine](https://github.com/santoshjammi29/databricks-handbook/blob/main/notebooks/03_delta_lake_storage_engine/03_01_delta_log_concurrency_and_acid.py)
+> - 🔬 **Empirical Lab:** [Spark Experiments — 6_0: Bucketing & Partition Pruning](https://github.com/santoshjammi29/spark-experiments/blob/main/spark/6_0_bucketing.ipynb)
+> - 🚨 **Incident Runbook:** [Databricks Runbook 02: Delta Log Compaction & Small Files](https://github.com/santoshjammi29/databricks-handbook/blob/main/runbooks/02_delta_log_compaction_and_checkpoint_lag.md)
+> - 🎯 **Interview Defense:** [Interview Handbook Master Guide](https://github.com/santoshjammi29/data-engineering-interview-handbook/blob/main/pillars/all_20_pillars_master_guide.md) *(You are here)*
+> - 🌐 **Interactive Web Practice:** [Compare Table Formats on moderndataengineer.uk](https://moderndataengineer.uk/compare)
+
 # Pillar 03: Modern Lakehouse & ACID Table Formats
 **Category:** `MODERN LAKEHOUSE` | **Domain:** `Storage Architectures & Table Formats`
 

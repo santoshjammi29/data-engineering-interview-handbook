@@ -1,3 +1,11 @@
+> 🧭 **Modern Data Engineering Ecosystem Navigation**
+> - 📘 **Architecture & Concept:** [Data System Design — Lakehouse Architecture](https://github.com/santoshjammi29/data-system-design-handbook/tree/main/modules/01_lakehouse_and_medallion_architecture)
+> - 💻 **Hands-On Recipe:** [Databricks Handbook — Production Recipes](https://github.com/santoshjammi29/databricks-handbook)
+> - 🔬 **Empirical Lab:** [Spark Experiments — Production Benchmarks](https://github.com/santoshjammi29/spark-experiments)
+> - 🚨 **Incident Runbook:** [DataOps CI/CD Incident Runbooks](https://github.com/santoshjammi29/dataops-cicd-handbook/tree/main/runbooks)
+> - 🎯 **Interview Defense:** [Interview Defense Playbook](https://github.com/santoshjammi29/data-engineering-interview-handbook/blob/main/playbooks/125_master_defense_playbook.md) *(You are here)*
+> - 🌐 **Interactive Web Practice:** [Practice on moderndataengineer.uk](https://moderndataengineer.uk/interview)
+
 ## Section 6: Project Experience & Interview Defense (Questions 96 – 110)
 
 ### Q96: Give a brief about your last project and what was your individual responsibilities?
@@ -5,7 +13,9 @@
 **STAR Project Brief:**
 - **Project Overview:** Built an enterprise real-time Lakehouse on Azure Databricks for an omnichannel retail platform processing 12M orders and 80M telemetry events daily ($4.5	ext{TB/day}$).
 - **Individual Responsibilities:**
-  - Designed the end-to-end Medallion data flow (Kafka $ightarrow$ ADLS Gen2 $ightarrow$ Delta Lake).
+  - Designed the end-to-end Medallion data flow (Kafka $
+ightarrow$ ADLS Gen2 $
+ightarrow$ Delta Lake).
   - Authored core PySpark Structured Streaming jobs with off-heap RocksDB state stores.
   - Implemented automated deduplication, SCD Type 2 dimensional tracking, and data quality expectations.
   - Built GitOps CI/CD deployment pipelines using Databricks Asset Bundles (DABs) and GitHub Actions.

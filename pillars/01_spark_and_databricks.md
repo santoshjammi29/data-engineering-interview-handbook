@@ -1,3 +1,11 @@
+> 🧭 **Modern Data Engineering Ecosystem Navigation**
+> - 📘 **Architecture & Concept:** [Data System Design — Storage Optimization & Clustering](https://github.com/santoshjammi29/data-system-design-handbook/tree/main/modules/04_storage_optimization_and_clustering)
+> - 💻 **Hands-On Recipe:** [PySpark Handbook — Notebook 08_03: Data Skew Mitigation](https://github.com/santoshjammi29/pyspark-handbook/blob/main/notebooks/08_performance_and_tuning/08_03_data_skew_mitigation_salting.py)
+> - 🔬 **Empirical Lab:** [Spark Experiments — 1_data_skew: Salting Benchmarks](https://github.com/santoshjammi29/spark-experiments/blob/main/spark/1_data_skew/4_salting.ipynb)
+> - 🚨 **Incident Runbook:** [PySpark Runbook 03: Data Skew & Two-Phase Salting](https://github.com/santoshjammi29/pyspark-handbook/blob/main/runbooks/03_data_skew_and_two_phase_salting.md)
+> - 🎯 **Interview Defense:** [Interview Handbook Master Guide](https://github.com/santoshjammi29/data-engineering-interview-handbook/blob/main/pillars/all_20_pillars_master_guide.md) *(You are here)*
+> - 🌐 **Interactive Web Practice:** [Practice PySpark on moderndataengineer.uk](https://moderndataengineer.uk/practice/pyspark?topic=data-skew)
+
 # Pillar 01: Apache Spark & Databricks Engine Architecture
 **Category:** `SPARK & DATABRICKS` | **Domain:** `Distributed Compute & Execution Engines`
 

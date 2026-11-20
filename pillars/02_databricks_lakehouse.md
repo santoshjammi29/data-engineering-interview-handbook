@@ -1,3 +1,11 @@
+> 🧭 **Modern Data Engineering Ecosystem Navigation**
+> - 📘 **Architecture & Concept:** [Data System Design — Lakehouse Architecture](https://github.com/santoshjammi29/data-system-design-handbook/tree/main/modules/01_lakehouse_and_medallion_architecture)
+> - 💻 **Hands-On Recipe:** [Databricks Handbook — Notebook 02_01: Unity Catalog Governance](https://github.com/santoshjammi29/databricks-handbook/blob/main/notebooks/02_unity_catalog_and_governance/02_01_three_level_namespace_and_securables.py)
+> - 🔬 **Empirical Lab:** [Databricks Blueprints — Omnichannel Retail Lakehouse](https://github.com/santoshjammi29/azure-databricks-project-blueprints/tree/main/src/project1_omnichannel_retail)
+> - 🚨 **Incident Runbook:** [Databricks Runbook 01: Driver OOM Heap Space Triage](https://github.com/santoshjammi29/databricks-handbook/blob/main/runbooks/01_driver_oom_heap_space_triage.md)
+> - 🎯 **Interview Defense:** [Interview Handbook Master Guide](https://github.com/santoshjammi29/data-engineering-interview-handbook/blob/main/pillars/all_20_pillars_master_guide.md) *(You are here)*
+> - 🌐 **Interactive Web Practice:** [Practice Databricks on moderndataengineer.uk](https://moderndataengineer.uk/practice/databricks)
+
 # Pillar 02: Databricks Lakehouse & Unity Catalog
 **Category:** `DATABRICKS` | **Domain:** `Lakehouse Governance & Databricks Platform`
 

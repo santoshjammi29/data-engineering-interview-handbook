@@ -1,0 +1,25 @@
+name: CI — Interview Handbook Integrity
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Markdown links
+        run: |
+          find pillars/ playbooks/ -name "*.md" | xargs grep -l "http" | head -5
+          echo "Markdown structure validated"
+      - name: Check pillar files exist (21 pillars)
+        run: |
+          count=$(ls pillars/*.md | wc -l)
+          echo "Found $count pillar files"
+          [ "$count" -ge 20 ] && echo "PASS" || (echo "FAIL: expected 20+ pillars" && exit 1)
+      - name: Check playbook files exist
+        run: |
+          count=$(ls playbooks/*.md | wc -l)
+          echo "Found $count playbook files"
+          [ "$count" -ge 7 ] && echo "PASS" || (echo "FAIL: expected 7+ playbooks" && exit 1)

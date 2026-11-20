@@ -1,3 +1,11 @@
+> 🧭 **Modern Data Engineering Ecosystem Navigation**
+> - 📘 **Architecture & Concept:** [Data System Design — Real-Time Event-Driven Lakehouse](https://github.com/santoshjammi29/data-system-design-handbook/tree/main/modules/06_realtime_event_driven_lakehouse)
+> - 💻 **Hands-On Recipe:** [Streaming Handbook — Module 09: End-to-End Exactly-Once](https://github.com/santoshjammi29/streaming-handbook/blob/main/modules/09_end_to_end_exactly_once/structured_streaming_exactly_once.py)
+> - 🔬 **Empirical Lab:** [Streaming Handbook — Docker Compose Kafka 3.9 KRaft & Flink 1.20](https://github.com/santoshjammi29/streaming-handbook/blob/main/modules/01_kafka_storage_and_partitioning/docker-compose.yml)
+> - 🚨 **Incident Runbook:** [Streaming Runbook: Consumer Lag & Rebalance Storms](https://github.com/santoshjammi29/streaming-handbook/tree/main/runbooks)
+> - 🎯 **Interview Defense:** [Interview Handbook Master Guide](https://github.com/santoshjammi29/data-engineering-interview-handbook/blob/main/pillars/all_20_pillars_master_guide.md) *(You are here)*
+> - 🌐 **Interactive Web Practice:** [Practice Streaming on moderndataengineer.uk](https://moderndataengineer.uk/practice/streaming)
+
 # Pillar 16: Apache Flink & Stateful Real-Time Stream Processing
 **Category:** `STREAMING & REAL-TIME` | **Domain:** `Stateful Stream Processing`
 
