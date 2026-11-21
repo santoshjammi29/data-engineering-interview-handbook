@@ -174,9 +174,9 @@ The handbook incorporates publication-grade architectural whiteboard blueprints 
 
 ---
 
-## 🌐 The Modern Data Engineering Lakehouse Ecosystem (13 Repositories)
+## 🌐 The Modern Data Engineering Lakehouse Ecosystem (14 Repositories)
 
-This handbook serves as the **Architectural Defense & Interview Playbook** within the tightly coupled 13-repository Lakehouse Ecosystem:
+This handbook serves as the **Architectural Defense & Interview Playbook** within the tightly coupled 14-repository Lakehouse Ecosystem:
 
 | ID | Repository | GitHub Slug | Focus & Role | Tightly Coupled Cross-Reference & Integration Points |
 |:---:|:---|:---|:---|:---|
@@ -193,4 +193,5 @@ This handbook serves as the **Architectural Defense & Interview Playbook** withi
 | **R11** | **Databricks Project Blueprints** | [`azure-databricks-project-blueprints`](https://github.com/santoshjammi29/azure-databricks-project-blueprints) | 3 Full-scale production reference architectures | • **Playbook 05 Project Defense**: End-to-end STAR project narratives for Retail Omnichannel, Fraud Detection, and Warehouse Cutover.<br>• **Dual-Run Verification**: Automated parity engines for migrations. |
 | **R12** | **Banking Risk Lakehouse** | [`enterprise-banking-risk-alm-lakehouse`](https://github.com/santoshjammi29/enterprise-banking-risk-alm-lakehouse) | Regulated financial lakehouse | • **Regulatory Governance Defense**: Real-world implementation of BCBS 239 risk data aggregation and IFRS 9 ECL.<br>• **Dynamic Masking**: Unity Catalog attribute-based access control (ABAC) in regulated environments. |
 | **R13** | **Spark Experiments** | [`spark-experiments`](https://github.com/santoshjammi29/spark-experiments) | Empirical skew & spill laboratory | • **Playbook 08 Defense**: 100 Spark Data Issues & Silent Corruptions backed by reproducible empirical benchmarks.<br>• **Physical Plan Verification**: Validating query execution DAGs under extreme data skew. |
+| **R14** | **Security Handbook** | [`security-handbook`](https://github.com/santoshjammi29/security-handbook) | Enterprise cloud security & governance | • **Pillars 17 & 18 Defense**: Zero Trust perimeter, workload identity federation, dynamic data masking, envelope encryption, and SOC2/ISO 27001 compliance.<br>• **Cloud Perimeter Incident Triage**: Defense playbooks for key rotation, credential leaks, and network isolation. |
 
