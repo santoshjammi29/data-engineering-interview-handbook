@@ -164,8 +164,8 @@ spark.sql.autoBroadcastJoinThreshold=67108864 # 64MB (Default 10MB)
 ---
 
 ## Related Documentation & Reproducibility Labs
-- **Distributed Core & Join Mechanics Deep Dive**: [`distributed_core_joins_and_skew_deep_dive.md`](./distributed_core_joins_and_skew_deep_dive.md)
-- **Synthetic Skew & Spill Reproduction Lab**: [`synthetic_skew_and_spill_lab.md`](./synthetic_skew_and_spill_lab.md)
-- **100 Databricks Interview Defense Playbook**: [`../interview_prep/100_databricks_interview_defense_playbook.md`](../interview_prep/100_databricks_interview_defense_playbook.md)
-- **200 Concepts Encyclopedia**: [`../interview_prep/200_databricks_spark_and_lakehouse_concepts_encyclopedia.md`](../interview_prep/200_databricks_spark_and_lakehouse_concepts_encyclopedia.md)
-- **Complete Whiteboard Blueprints Hub (20 Pillars & 8 Playbooks)**: [`../whiteboard_diagrams/handbook_whiteboard_blueprints.md`](../whiteboard_diagrams/handbook_whiteboard_blueprints.md)
+- **Distributed Core & Join Mechanics Deep Dive**: [`distributed_core_joins_and_skew_deep_dive.md`](https://github.com/santoshjammi29/moderndataengineer/blob/main/docs/engineering/distributed_core_joins_and_skew_deep_dive.md)
+- **Synthetic Skew & Spill Reproduction Lab**: [`synthetic_skew_and_spill_lab.md`](https://github.com/santoshjammi29/moderndataengineer/blob/main/docs/engineering/synthetic_skew_and_spill_lab.md)
+- **100 Databricks Interview Defense Playbook**: [`100_databricks_interview_defense_playbook.md`](../playbooks/100_databricks_interview_defense_playbook.md)
+- **200 Concepts Encyclopedia**: [`200_databricks_spark_and_lakehouse_concepts_encyclopedia.md`](https://github.com/santoshjammi29/moderndataengineer/blob/main/docs/interview_prep/200_databricks_spark_and_lakehouse_concepts_encyclopedia.md)
+- **Complete Whiteboard Blueprints Hub (20 Pillars & 8 Playbooks)**: [`handbook_whiteboard_blueprints.md`](../whiteboards/handbook_whiteboard_blueprints.md)
