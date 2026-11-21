@@ -59,8 +59,81 @@ data-engineering-interview-handbook/
 
 ## 🎨 Architectural Whiteboards & Cheatsheets
 
+The handbook incorporates publication-grade architectural whiteboard blueprints mirrored under [`assets/whiteboards/`](assets/whiteboards) and indexed with comprehensive multi-persona breakdowns, failure modes, and engine internals in [`docs/whiteboard_diagrams/README.md`](docs/whiteboard_diagrams/README.md).
+
 - 🖼️ **[Master Whiteboard Blueprints Hub (20 Pillars & 8 Playbooks)](whiteboards/handbook_whiteboard_blueprints.md)**: 28 Dual-Plane & 3-Panel architectural whiteboard diagrams detailing storage vs. compute, control vs. data planes, distributed memory mechanics, and failure modes.
 - 📊 **[Spark Architecture & Performance Cheatsheets](cheatsheets/spark_architecture_and_tuning_cheatsheet.md)**: High-resolution visual whiteboard cheatsheets covering Spark cluster topology, the 5-phase Catalyst compiler lifecycle, distributed join decision tree, and Spark UI straggler triage.
+
+### 📐 Visual Blueprints Showcase (2x2 Grid)
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <a href="docs/whiteboard_diagrams/README.md#databricks-platform-master">
+        <img src="assets/whiteboards/databricks_ecosystem_landscape.webp" alt="Databricks Unified Data Intelligence Platform" width="100%" />
+      </a>
+      <br><strong>Databricks Unified Data Intelligence Platform</strong><br>
+      <em>Core architecture for Pillars 01 & 02: Control Plane, Classic/Serverless Compute, Unity Catalog, and Lakeflow.</em>
+    </td>
+    <td width="50%" valign="top">
+      <a href="docs/whiteboard_diagrams/README.md#spark-catalyst-photon-engine">
+        <img src="assets/whiteboards/catalyst_photon_engine.webp" alt="Databricks Compute: Catalyst Optimizer, AQE & Photon" width="100%" />
+      </a>
+      <br><strong>Databricks Compute: Catalyst Optimizer, AQE & Photon</strong><br>
+      <em>Pillar 01 & Playbook 01 defense: 5-phase relational compiler, AQE runtime adaptations, and native C++ SIMD vectorization.</em>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <a href="docs/whiteboard_diagrams/README.md#delta-vs-iceberg-architecture">
+        <img src="assets/whiteboards/delta_lake_vs_iceberg_architecture.webp" alt="Delta Lake vs. Apache Iceberg Storage & Metadata Architecture" width="100%" />
+      </a>
+      <br><strong>Delta Lake vs. Apache Iceberg Storage & Metadata Architecture</strong><br>
+      <em>Pillars 03 & 15 defense: Linear ACID commit log vs 4-tier hierarchical metadata trees, positional deletes, and UniForm.</em>
+    </td>
+    <td width="50%" valign="top">
+      <a href="docs/whiteboard_diagrams/README.md#kafka-event-streaming-pipeline">
+        <img src="assets/whiteboards/kafka_event_streaming_pipeline.webp" alt="Real-Time Event Streaming & Kafka Architecture" width="100%" />
+      </a>
+      <br><strong>Real-Time Event Streaming & Kafka Architecture</strong><br>
+      <em>Pillar 16 & Playbook 02 defense: Distributed commit log, partition replication, consumer group rebalances, and exactly-once.</em>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <a href="docs/whiteboard_diagrams/README.md#apache-airflow-distributed-architecture">
+        <img src="assets/whiteboards/apache_airflow_architecture.webp" alt="Apache Airflow Distributed Production Architecture" width="100%" />
+      </a>
+      <br><strong>Apache Airflow Distributed Production Architecture</strong><br>
+      <em>Pillar 05 defense: Airflow 2/3 decoupled scheduler, Triggerer daemon, dynamic task mapping, and high-availability executors.</em>
+    </td>
+    <td width="50%" valign="top">
+      <a href="docs/whiteboard_diagrams/README.md#kimball-dimensional-star-schema">
+        <img src="assets/whiteboards/kimball_dimensional_star_schema.webp" alt="Kimball Dimensional Modeling & Enterprise Star Schema" width="100%" />
+      </a>
+      <br><strong>Kimball Dimensional Modeling & Enterprise Star Schema</strong><br>
+      <em>Pillars 10 & 12 defense: Fact-dimension modeling, surrogate keys, conformed dimensions, and star vs snowflake trade-offs.</em>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <a href="docs/whiteboard_diagrams/README.md#data-quality-wap-quarantine">
+        <img src="assets/whiteboards/data_quality_wap_quarantine_architecture.webp" alt="Data Quality Observability & Write-Audit-Publish (WAP) Circuit Breaker Flow" width="100%" />
+      </a>
+      <br><strong>Data Quality Observability & WAP Circuit Breaker Flow</strong><br>
+      <em>Pillar 20 defense: Production data contract enforcement, automated testing circuit breakers, and quarantine routing.</em>
+    </td>
+    <td width="50%" valign="top">
+      <a href="docs/whiteboard_diagrams/README.md#lakehouse-finops-cost-optimization">
+        <img src="assets/whiteboards/lakehouse_finops_cost_optimization.webp" alt="Enterprise Lakehouse FinOps & Cloud Cost Optimization" width="100%" />
+      </a>
+      <br><strong>Enterprise Lakehouse FinOps & Cloud Cost Optimization</strong><br>
+      <em>Pillar 19 & Playbook 07 defense: System Tables billing attribution, cluster right-sizing, and cost anomaly alerts.</em>
+    </td>
+  </tr>
+</table>
+
+> 🔍 **Explore all 52 blueprints with 5-persona breakdowns, failure modes, and engine internals in [docs/whiteboard_diagrams/README.md](docs/whiteboard_diagrams/README.md)**.
 
 ---
 
@@ -105,19 +178,19 @@ data-engineering-interview-handbook/
 
 This handbook serves as the **Architectural Defense & Interview Playbook** within the tightly coupled 13-repository Lakehouse Ecosystem:
 
-| ID | Repository | GitHub Slug | Role in Ecosystem |
-|:---:|:---|:---|:---|
-| **R01** | **Web Hub** | [`moderndataengineer`](https://github.com/santoshjammi29/moderndataengineer) | Flagship web platform (`moderndataengineer.uk`), 11,900+ searchable assets, interactive practice runner, 52 whiteboard blueprints. |
-| **R02** | **Databricks Handbook** | [`databricks-handbook`](https://github.com/santoshjammi29/databricks-handbook) | 105 Databricks production recipes, Unity Catalog, Delta Lake 3.x, Lakeflow, Serverless, DABs, FinOps runbooks. |
-| **R03** | **PySpark Handbook** | [`pyspark-handbook`](https://github.com/santoshjammi29/pyspark-handbook) | 105 PySpark code use cases, Catalyst internals, Tungsten off-heap memory, AQE tuning, Arrow UDFs, skew salting. |
-| **R04** | **SQL Handbook** | [`sql-handbook`](https://github.com/santoshjammi29/sql-handbook) | 105 SQL production exercises, query execution plans, MPP distributed joins, MVCC concurrency, cross-engine Rosetta Stone. |
-| **R05** | **dbt Handbook** | [`dbt-handbook`](https://github.com/santoshjammi29/dbt-handbook) | Production analytics engineering: dbt Mesh, Microbatch incremental strategies, schema contracts, unit tests, Semantic Layer. |
-| **R06** | **Streaming Handbook** | [`streaming-handbook`](https://github.com/santoshjammi29/streaming-handbook) | Distributed event streaming: Kafka 3.9 KRaft, Apache Flink stateful processing, RocksDB tuning, CDC Debezium, exactly-once. |
-| **R07** | **DataOps & CI/CD Handbook** | [`dataops-cicd-handbook`](https://github.com/santoshjammi29/dataops-cicd-handbook) | Platform engineering: GitOps, Terraform & Bicep IaC, Write-Audit-Publish (WAP), Data Diff testing, Slim CI state deferral. |
-| **R08** | **System Design Handbook** | [`data-system-design-handbook`](https://github.com/santoshjammi29/data-system-design-handbook) | Distributed systems architecture: Table formats (Delta, Iceberg, Hudi), catalog federation, storage clustering (Liquid, Z-Order). |
-| **R09** | **Interview Handbook** | [`data-engineering-interview-handbook`](https://github.com/santoshjammi29/data-engineering-interview-handbook) | *(You are here)* Architectural defense playbook: 20 Knowledge Pillars, 10 125-series playbooks, 595+ production questions. |
-| **R10** | **Azure Cheat Sheet** | [`azure-cheat-sheet`](https://github.com/santoshjammi29/azure-cheat-sheet) | Azure Lakehouse & Infrastructure: Microsoft Fabric OneLake, Synapse, Bicep IaC templates, 1-page & 2-page vector cheat sheets. |
-| **R11** | **Databricks Project Blueprints** | [`azure-databricks-project-blueprints`](https://github.com/santoshjammi29/azure-databricks-project-blueprints) | 3 Full-scale production reference architectures: Retail Omnichannel Lakehouse (DLT), Real-time Payments Fraud, Warehouse Cutover. |
-| **R12** | **Banking Risk Lakehouse** | [`enterprise-banking-risk-alm-lakehouse`](https://github.com/santoshjammi29/enterprise-banking-risk-alm-lakehouse) | European banking compliance (DNB, ECB, BCBS 239), IFRS 9 ECL calculations, and IRRBB ALM Monte Carlo simulations. |
-| **R13** | **Spark Experiments** | [`spark-experiments`](https://github.com/santoshjammi29/spark-experiments) | Empirical laboratory: Reproducible data skew generation (1M+ rows), two-phase salting benchmarks, query plan and DAG physical analysis. |
+| ID | Repository | GitHub Slug | Focus & Role | Tightly Coupled Cross-Reference & Integration Points |
+|:---:|:---|:---|:---|:---|
+| **R01** | **Web Hub** | [`moderndataengineer`](https://github.com/santoshjammi29/moderndataengineer) | Flagship presentation platform & edge runner | • **Interactive Defense Explorer**: Practice all 595 questions and scenarios on [moderndataengineer.uk](https://moderndataengineer.uk).<br>• **52 Whiteboard Viewer**: Pan, zoom, and inspect all schematics online. |
+| **R02** | **Databricks Handbook** | [`databricks-handbook`](https://github.com/santoshjammi29/databricks-handbook) | 105 Databricks production recipes | • **Pillars 01 & 02 Defense**: Operational recipes for Unity Catalog, Delta Lake 3.x, and Serverless compute.<br>• **100 Databricks Playbook**: Companion implementations for the 100 Databricks defense questions. |
+| **R03** | **PySpark Handbook** | [`pyspark-handbook`](https://github.com/santoshjammi29/pyspark-handbook) | 105 PySpark code recipes | • **Pillar 01 & 11 Code Verification**: Executable recipes for Catalyst optimizer rules, Tungsten off-heap memory, and Arrow UDFs.<br>• **Playbook 01 Defense**: Code proofs for join strategy selection and skew salting. |
+| **R04** | **SQL Handbook** | [`sql-handbook`](https://github.com/santoshjammi29/sql-handbook) | 105 SQL production exercises | • **Pillars 09 & 10 Defense**: Relational database storage engine mechanics, B-Tree vs LSM, and Columnstore rowgroups.<br>• **Cross-Engine Rosetta Stone**: ANSI SQL to PySpark and Polars translations. |
+| **R05** | **dbt Handbook** | [`dbt-handbook`](https://github.com/santoshjammi29/dbt-handbook) | Production analytics engineering | • **Pillar 07 Defense**: dbt Mesh cross-project dependencies, Microbatch incremental strategy, and contracts.<br>• **Pillar 20 WAP Pattern**: Implementing Write-Audit-Publish circuit breakers in dbt. |
+| **R06** | **Streaming Handbook** | [`streaming-handbook`](https://github.com/santoshjammi29/streaming-handbook) | Distributed event streaming | • **Pillar 16 & Playbook 02 Defense**: Kafka KRaft commit logs, Flink stateful processing, and RocksDB state store tuning.<br>• **Exactly-Once Semantics**: Two-phase commit protocol end-to-end verification. |
+| **R07** | **DataOps & CI/CD Handbook** | [`dataops-cicd-handbook`](https://github.com/santoshjammi29/dataops-cicd-handbook) | Platform engineering & GitOps | • **Pillars 04 & 05 Defense**: Production Airflow 2/3 architecture, dynamic task mapping, and multi-scheduler HA.<br>• **Playbook 07 Leadership**: Data contract specifications and incident postmortem templates. |
+| **R08** | **System Design Handbook** | [`data-system-design-handbook`](https://github.com/santoshjammi29/data-system-design-handbook) | Distributed systems & table formats | • **Pillars 03, 14 & 15 Defense**: Delta Lake vs Iceberg vs Hudi architectural tradeoffs and metadata trees.<br>• **Playbook 06 High-Throughput**: Sub-50ms fraud detection and cross-region BCDR architectures. |
+| **R09** | **Interview Handbook** | [`data-engineering-interview-handbook`](https://github.com/santoshjammi29/data-engineering-interview-handbook) | *(You are here)* Architectural defense playbook | Master 20-pillar knowledge base, 10 125-series playbooks, and 595 production interview questions. |
+| **R10** | **Azure Cheat Sheet** | [`azure-cheat-sheet`](https://github.com/santoshjammi29/azure-cheat-sheet) | Fabric OneLake & Azure infrastructure | • **Pillars 06, 08 & 13 Defense**: Microsoft Fabric OneLake Shortcuts, Direct Lake mode, and Power BI VertiPaq.<br>• **Vector Cheat Sheets**: Printable high-density reference cards for Azure architectures. |
+| **R11** | **Databricks Project Blueprints** | [`azure-databricks-project-blueprints`](https://github.com/santoshjammi29/azure-databricks-project-blueprints) | 3 Full-scale production reference architectures | • **Playbook 05 Project Defense**: End-to-end STAR project narratives for Retail Omnichannel, Fraud Detection, and Warehouse Cutover.<br>• **Dual-Run Verification**: Automated parity engines for migrations. |
+| **R12** | **Banking Risk Lakehouse** | [`enterprise-banking-risk-alm-lakehouse`](https://github.com/santoshjammi29/enterprise-banking-risk-alm-lakehouse) | Regulated financial lakehouse | • **Regulatory Governance Defense**: Real-world implementation of BCBS 239 risk data aggregation and IFRS 9 ECL.<br>• **Dynamic Masking**: Unity Catalog attribute-based access control (ABAC) in regulated environments. |
+| **R13** | **Spark Experiments** | [`spark-experiments`](https://github.com/santoshjammi29/spark-experiments) | Empirical skew & spill laboratory | • **Playbook 08 Defense**: 100 Spark Data Issues & Silent Corruptions backed by reproducible empirical benchmarks.<br>• **Physical Plan Verification**: Validating query execution DAGs under extreme data skew. |
 
