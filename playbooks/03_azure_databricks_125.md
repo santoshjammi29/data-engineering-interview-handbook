@@ -252,9 +252,7 @@ Databricks interacts with ADLS Gen2 using the **ABFS (Azure Blob File System) dr
 - **Modern Security Architecture:** Access is governed via **Unity Catalog External Locations** backed by **Azure Managed Identities**. Compute clusters never hold raw storage keys or SAS tokens.
 - **Direct Cloud Object Access:** Data reads stream directly from ADLS Gen2 blobs into worker memory using multi-threaded parallel HTTP GET requests.
 
-
 ---
-
 
 ---
 

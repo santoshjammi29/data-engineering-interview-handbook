@@ -137,7 +137,7 @@ processedStream.getSideOutput(deadLetterTag).sinkTo(dlqSink);
 
 A Temporal Table Join enriches an event stream against a changing CDC dimension table at the **exact point in time** the event occurred.
 ```sql
-SELECT 
+SELECT
   o.order_id, o.amount, o.order_time, c.currency, o.amount * r.rate AS amount_usd
 FROM orders o
 JOIN currency_rates FOR SYSTEM_TIME AS OF o.order_time AS r

@@ -242,9 +242,7 @@ spark.conf.set("spark.sql.streaming.stateStore.rocksdb.boundedMemoryUsage", "tru
 
 ---
 
-
 ---
-
 
 # Pillar 02: Databricks Lakehouse & Unity Catalog
 **Category:** `DATABRICKS` | **Domain:** `Lakehouse Governance & Databricks Platform`
@@ -260,7 +258,7 @@ Unity Catalog organizes data in a 3-tier hierarchy: `catalog.schema.table`.
 - **Dynamic Row Filtering & Column Masking:** Defined using native SQL UDFs without creating duplicate sanitized views:
 ```sql
 -- Column Masking for PII
-CREATE FUNCTION mask_ssn(ssn STRING) RETURN 
+CREATE FUNCTION mask_ssn(ssn STRING) RETURN
   CASE WHEN is_account_group_member('hr_admins') THEN ssn ELSE 'XXX-XX-' || RIGHT(ssn, 4) END;
 ALTER TABLE hr_catalog.payroll.employees ALTER COLUMN ssn SET MASK mask_ssn;
 
@@ -396,7 +394,7 @@ SELECT
     ROUND(SUM(usage.usage_quantity * pricing.pricing.default), 2) AS estimated_usd_cost
 FROM system.billing.usage usage
 JOIN system.billing.list_prices pricing
-  ON usage.cloud = pricing.cloud 
+  ON usage.cloud = pricing.cloud
   AND usage.sku_name = pricing.sku_name
   AND usage.usage_start_time >= pricing.price_start_time
   AND (pricing.price_end_time IS NULL OR usage.usage_end_time < pricing.price_end_time)
@@ -448,7 +446,7 @@ Unity Catalog supports fine-grained access control using SQL user-defined functi
 -- 1. Column Masking Function
 CREATE OR REPLACE FUNCTION mask_ssn(ssn STRING)
 RETURNS STRING
-RETURN CASE 
+RETURN CASE
   WHEN is_account_group_member('hr_admins') THEN ssn
   ELSE CONCAT('XXX-XX-', RIGHT(ssn, 4))
 END;
@@ -458,7 +456,7 @@ ALTER TABLE gold.employees ALTER COLUMN ssn SET MASK mask_ssn;
 -- 2. Row Filtering Function
 CREATE OR REPLACE FUNCTION filter_by_region(region STRING)
 RETURNS BOOLEAN
-RETURN is_account_group_member('executives') OR 
+RETURN is_account_group_member('executives') OR
        (is_account_group_member('emea_sales') AND region = 'EMEA');
 
 ALTER TABLE gold.sales SET ROW FILTER filter_by_region ON (region);
@@ -487,7 +485,7 @@ Queries run without code changes; unauthorized users automatically receive maske
 Databricks system tables expose audit logs, billing usage, and access telemetry as standard Delta tables under the `system` catalog:
 ```sql
 -- Track top 5 most expensive DLT pipelines over the last 30 days
-SELECT 
+SELECT
   usage_metadata.pipeline_id,
   SUM(usage_quantity) AS total_dbus,
   SUM(usage_quantity * 0.35) AS estimated_usd -- custom rate card
@@ -518,9 +516,7 @@ GROUP BY 1;
 
 ---
 
-
 ---
-
 
 # Pillar 03: Modern Lakehouse & ACID Table Formats
 **Category:** `MODERN LAKEHOUSE` | **Domain:** `Storage Architectures & Table Formats`
@@ -706,9 +702,7 @@ Delta Lake assumes transactions will not conflict. Each writer reads table versi
 
 ---
 
-
 ---
-
 
 # Pillar 04: Data Lake Architecture & Object Storage
 **Category:** `DATALAKE ARCHITECTURE` | **Domain:** `Cloud Storage & Data Lake Infrastructure`
@@ -883,9 +877,7 @@ Catalog Federation allows a central query engine to query external catalogs (e.g
 
 ---
 
-
 ---
-
 
 # Pillar 05: Apache Airflow & Orchestration
 **Category:** `APACHE AIRFLOW` | **Domain:** `Pipeline Orchestration & Workflow Scheduling`
@@ -1103,9 +1095,7 @@ Airflow 2.0+ supports active-active multi-scheduler high availability without di
 
 ---
 
-
 ---
-
 
 # Pillar 06: Azure Data Factory (ADF) & Integration Runtimes
 **Category:** `ADF` | **Domain:** `Cloud ETL & Orchestration`
@@ -1279,9 +1269,7 @@ ADF Mapping Data Flows translate visual GUI graph transformations into Scala/Spa
 
 ---
 
-
 ---
-
 
 # Pillar 07: dbt (Data Build Tool) & Analytics Engineering
 **Category:** `DBT` | **Domain:** `Analytics Engineering & Transformation`
@@ -1465,9 +1453,7 @@ In large enterprises, a single monolithic dbt project with 4,000 models causes d
 
 ---
 
-
 ---
-
 
 # Pillar 08: Microsoft Fabric & Unified Analytics
 **Category:** `FABRIC` | **Domain:** `Unified SaaS Analytics & Microsoft Fabric`
@@ -1644,9 +1630,7 @@ Fabric compute is measured in Capacity Units (CUs) tied to F-SKUs (e.g. F64 = 64
 
 ---
 
-
 ---
-
 
 # Pillar 09: Database Architecture & Distributed Systems
 **Category:** `DATABASE ARCHITECTURE` | **Domain:** `Database Internals & Distributed Storage`
@@ -1827,9 +1811,7 @@ Raft decomposes consensus into 3 independent sub-problems:
 
 ---
 
-
 ---
-
 
 # Pillar 10: SQL Server & T-SQL Mastery
 **Category:** `SQL SERVER` | **Domain:** `Relational Databases & Enterprise T-SQL`
@@ -2020,7 +2002,7 @@ Readers read committed row versions from the **TempDB Version Store** rather tha
 **TempDB Pressure:** Heavy update workloads fill TempDB version store space.
 **Monitoring:**
 ```sql
-SELECT 
+SELECT
   SUM(version_store_reserved_page_count) * 8 / 1024 AS version_store_mb
 FROM sys.dm_db_file_space_usage;
 ```
@@ -2033,7 +2015,7 @@ FROM sys.dm_db_file_space_usage;
 
 ```sql
 -- Find top queries by CPU consumption with cached query plans
-SELECT TOP 5 
+SELECT TOP 5
   qs.total_worker_time / qs.execution_count AS avg_cpu,
   SUBSTRING(st.text, (qs.statement_start_offset/2)+1, ((qs.statement_end_offset/2)+1)) AS query_text,
   qp.query_plan
@@ -2045,9 +2027,7 @@ ORDER BY avg_cpu DESC;
 
 ---
 
-
 ---
-
 
 # Pillar 11: Python for Data Engineering & High-Performance Pipelines
 **Category:** `PYTHON` | **Domain:** `Software Engineering & Data Processing`
@@ -2291,9 +2271,7 @@ Compiled into a native `.so` wheel using `maturin`. It runs at bare-metal C/Rust
 
 ---
 
-
 ---
-
 
 # Pillar 12: Data Modeling, CDC & Streaming Ingestion
 **Category:** `GENERAL DE` | **Domain:** `Data Architecture & Integration`
@@ -2373,7 +2351,7 @@ $$\text{Partitions} = \max\left(\frac{500}{50}, \frac{500}{25}\right) = \max(10,
 **Production DLQ Architecture:**
 1. Catch deserialization or validation errors; wrap payload with error metadata (stack trace, timestamp, source topic, partition, offset).
 2. Publish to `topic.dlq` without stopping the primary stream.
-3. Alert engineering team when DLQ message count exceeds threshold (e.g. $> 10\text{ messages/min}$). 
+3. Alert engineering team when DLQ message count exceeds threshold (e.g. $> 10\text{ messages/min}$).
 4. Implement an administrative reprocessing tool that replays fixed DLQ records back to the main topic once upstream bugs are patched.
 
 ---
@@ -2467,9 +2445,7 @@ Bi-Temporal modeling tracks two distinct timelines for every record:
 
 ---
 
-
 ---
-
 
 # Pillar 13: Power BI, Semantic Layer & Serving
 **Category:** `POWER BI` | **Domain:** `Business Intelligence & Serving Layer`
@@ -2640,9 +2616,7 @@ When a user opens the report, `USERPRINCIPALNAME()` extracts their authenticated
 
 ---
 
-
 ---
-
 
 # Pillar 14: Enterprise System Design at Scale
 **Category:** `SYSTEM DESIGN` | **Domain:** `Enterprise Architecture & System Design`
@@ -2830,9 +2804,7 @@ When a user opens the report, `USERPRINCIPALNAME()` extracts their authenticated
 
 ---
 
-
 ---
-
 
 # Pillar 15: Apache Iceberg & Modern Open Table Formats
 **Category:** `OPEN TABLE FORMATS` | **Domain:** `Modern Open Table Formats`
@@ -2957,9 +2929,7 @@ Zero impact on production readers; dirty batches are dropped by deleting the bra
 
 ---
 
-
 ---
-
 
 # Pillar 16: Apache Flink & Stateful Real-Time Stream Processing
 **Category:** `STREAMING & REAL-TIME` | **Domain:** `Stateful Stream Processing`
@@ -3092,7 +3062,7 @@ processedStream.getSideOutput(deadLetterTag).sinkTo(dlqSink);
 
 A Temporal Table Join enriches an event stream against a changing CDC dimension table at the **exact point in time** the event occurred.
 ```sql
-SELECT 
+SELECT
   o.order_id, o.amount, o.order_time, c.currency, o.amount * r.rate AS amount_usd
 FROM orders o
 JOIN currency_rates FOR SYSTEM_TIME AS OF o.order_time AS r
@@ -3113,9 +3083,7 @@ In classic Flink, changing job parallelism required stopping the job, taking a s
 
 ---
 
-
 ---
-
 
 # Pillar 17: Distributed MPP Query Engines: Trino, Presto & DuckDB
 **Category:** `QUERY ENGINES & ANALYTICS` | **Domain:** `Distributed MPP Query Engines`
@@ -3207,8 +3175,8 @@ SET s3_access_key_id='AKIA...';
 SET s3_secret_access_key='...';
 
 -- Query remote Parquet files with automatic projection and filter pushdown:
-SELECT 
-  customer_id, 
+SELECT
+  customer_id,
   SUM(amount) AS total_spend
 FROM read_parquet('s3://my-lakehouse/orders/*.parquet')
 WHERE order_date >= '2026-11-01'
@@ -3232,8 +3200,8 @@ pl_df = pl.DataFrame({"id": [1, 2, 3], "val": [10.5, 20.2, 30.1]})
 # Query Polars DataFrame in DuckDB with ZERO COPY:
 con = duckdb.connect()
 result = con.execute("""
-    SELECT id, val * 2 AS doubled 
-    FROM pl_df 
+    SELECT id, val * 2 AS doubled
+    FROM pl_df
     WHERE val > 15.0
 """).arrow()
 
@@ -3269,9 +3237,7 @@ On tables with 100,000+ files, fetching Iceberg manifest files over S3 during qu
 
 ---
 
-
 ---
-
 
 # Pillar 18: GenAI, Vector Search & Lakehouse Embeddings
 **Category:** `GENAI & VECTOR DATA ENGINEERING` | **Domain:** `GenAI & Vector Platforms`
@@ -3415,9 +3381,7 @@ Embeddings from different models (e.g. OpenAI `text-embedding-ada-002` [1536 dim
 
 ---
 
-
 ---
-
 
 # Pillar 19: Enterprise FinOps, Compute Governance & Cost Engineering
 **Category:** `FINOPS & COST OPTIMIZATION` | **Domain:** `Enterprise FinOps & Cost Engineering`
@@ -3538,9 +3502,7 @@ Saves tens of thousands of dollars in abandoned developer compute.
 
 ---
 
-
 ---
-
 
 # Pillar 20: Data Quality, Contracts, Circuit Breakers & Observability
 **Category:** `DATA QUALITY & OBSERVABILITY` | **Domain:** `Data Reliability & Quality Engineering`
@@ -3655,12 +3617,12 @@ Deploy an API Gateway (Kong / Envoy) or Kafka Schema Registry enforcing JSON Sch
 
 ```sql
 -- Monitor freshness lag in Delta Lake tables
-SELECT 
+SELECT
   table_name,
   max_event_timestamp,
   current_timestamp() AS check_time,
   TIMESTAMPDIFF(MINUTE, max_event_timestamp, current_timestamp()) AS latency_minutes,
-  CASE 
+  CASE
     WHEN TIMESTAMPDIFF(MINUTE, max_event_timestamp, current_timestamp()) > 30 THEN 'SLA_BREACH'
     ELSE 'HEALTHY'
   END AS sla_status
@@ -3693,6 +3655,4 @@ Expose metrics via Prometheus/Grafana or Databricks Lakehouse Monitoring to aler
 
 ---
 
-
 ---
-

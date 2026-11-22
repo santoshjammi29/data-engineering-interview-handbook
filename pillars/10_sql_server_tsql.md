@@ -195,7 +195,7 @@ Readers read committed row versions from the **TempDB Version Store** rather tha
 **TempDB Pressure:** Heavy update workloads fill TempDB version store space.
 **Monitoring:**
 ```sql
-SELECT 
+SELECT
   SUM(version_store_reserved_page_count) * 8 / 1024 AS version_store_mb
 FROM sys.dm_db_file_space_usage;
 ```
@@ -208,7 +208,7 @@ FROM sys.dm_db_file_space_usage;
 
 ```sql
 -- Find top queries by CPU consumption with cached query plans
-SELECT TOP 5 
+SELECT TOP 5
   qs.total_worker_time / qs.execution_count AS avg_cpu,
   SUBSTRING(st.text, (qs.statement_start_offset/2)+1, ((qs.statement_end_offset/2)+1)) AS query_text,
   qp.query_plan

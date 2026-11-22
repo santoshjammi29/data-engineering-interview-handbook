@@ -10,7 +10,7 @@
 
 ### Q51: Explain your real time experience in Kafka.
 
-"In our production enterprise payments and telemetry lakehouse, I architected a multi-cluster Apache Kafka deployment (KRaft mode) processing over **150,000 events/second** (peaks of 250MB/sec). 
+"In our production enterprise payments and telemetry lakehouse, I architected a multi-cluster Apache Kafka deployment (KRaft mode) processing over **150,000 events/second** (peaks of 250MB/sec).
 My responsibilities included:
 1. **Topic Partition Topology:** Sizing partitions based on consumer throughput ($P = \max(T/P_{prod}, T/P_{cons})$) across 32 partitions per high-velocity topic.
 2. **End-to-End Exactly-Once Semantics (EOS):** Configuring idempotent producers (`enable.idempotence=true`), transactional producer coordinators, and `read_committed` consumer isolation.
@@ -92,7 +92,6 @@ sequenceDiagram
    ```
 3. **Delta Lake Schema Evolution:**
    When writing to Delta Lake, enable `.option("mergeSchema", "true")`. Delta automatically appends new columns to the `_delta_log` metadata without rewriting historical Parquet files.
-
 
 ---
 

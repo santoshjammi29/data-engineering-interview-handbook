@@ -92,7 +92,7 @@ SELECT
         PARTITION BY user_id ORDER BY travel_date
     ) AS origin_city,
     LAST_VALUE(city) OVER (
-        PARTITION BY user_id ORDER BY travel_date 
+        PARTITION BY user_id ORDER BY travel_date
         ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
     ) AS final_destination_city
 FROM travel_history;
@@ -212,7 +212,7 @@ col_null_counts.show()
 
 # 2. Row-wise Null Count
 null_expression = sum([
-    F.when(F.col(c).isNull(), 1).otherwise(0) 
+    F.when(F.col(c).isNull(), 1).otherwise(0)
     for c in df.columns
 ])
 df_with_row_nulls = df.withColumn("row_null_count", null_expression)
@@ -741,7 +741,7 @@ WHEN MATCHED AND target.address <> source.address THEN
 
 -- Step 2: Insert the new active version
 INSERT INTO dim_customers
-SELECT 
+SELECT
     uuid(), source.customer_id, source.address, source.effective_time, '9999-12-31', true
 FROM customer_updates source;
 ```
@@ -760,7 +760,7 @@ SELECT
     SUM(CASE WHEN txn_type = 'CREDIT' THEN amount ELSE 0 END) AS total_credited,
     SUM(CASE WHEN txn_type = 'DEBIT' THEN amount ELSE 0 END) AS total_debited,
     ROUND(
-        COUNT(CASE WHEN txn_type = 'DEBIT' THEN 1 END) * 1.0 / 
+        COUNT(CASE WHEN txn_type = 'DEBIT' THEN 1 END) * 1.0 /
         NULLIF(COUNT(CASE WHEN txn_type = 'CREDIT' THEN 1 END), 0), 2
     ) AS debit_to_credit_ratio
 FROM transactions
