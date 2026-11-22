@@ -96,8 +96,8 @@ SET s3_access_key_id='AKIA...';
 SET s3_secret_access_key='...';
 
 -- Query remote Parquet files with automatic projection and filter pushdown:
-SELECT 
-  customer_id, 
+SELECT
+  customer_id,
   SUM(amount) AS total_spend
 FROM read_parquet('s3://my-lakehouse/orders/*.parquet')
 WHERE order_date >= '2026-11-01'
@@ -121,8 +121,8 @@ pl_df = pl.DataFrame({"id": [1, 2, 3], "val": [10.5, 20.2, 30.1]})
 # Query Polars DataFrame in DuckDB with ZERO COPY:
 con = duckdb.connect()
 result = con.execute("""
-    SELECT id, val * 2 AS doubled 
-    FROM pl_df 
+    SELECT id, val * 2 AS doubled
+    FROM pl_df
     WHERE val > 15.0
 """).arrow()
 

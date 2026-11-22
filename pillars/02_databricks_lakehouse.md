@@ -20,7 +20,7 @@ Unity Catalog organizes data in a 3-tier hierarchy: `catalog.schema.table`.
 - **Dynamic Row Filtering & Column Masking:** Defined using native SQL UDFs without creating duplicate sanitized views:
 ```sql
 -- Column Masking for PII
-CREATE FUNCTION mask_ssn(ssn STRING) RETURN 
+CREATE FUNCTION mask_ssn(ssn STRING) RETURN
   CASE WHEN is_account_group_member('hr_admins') THEN ssn ELSE 'XXX-XX-' || RIGHT(ssn, 4) END;
 ALTER TABLE hr_catalog.payroll.employees ALTER COLUMN ssn SET MASK mask_ssn;
 
@@ -156,7 +156,7 @@ SELECT
     ROUND(SUM(usage.usage_quantity * pricing.pricing.default), 2) AS estimated_usd_cost
 FROM system.billing.usage usage
 JOIN system.billing.list_prices pricing
-  ON usage.cloud = pricing.cloud 
+  ON usage.cloud = pricing.cloud
   AND usage.sku_name = pricing.sku_name
   AND usage.usage_start_time >= pricing.price_start_time
   AND (pricing.price_end_time IS NULL OR usage.usage_end_time < pricing.price_end_time)
@@ -208,7 +208,7 @@ Unity Catalog supports fine-grained access control using SQL user-defined functi
 -- 1. Column Masking Function
 CREATE OR REPLACE FUNCTION mask_ssn(ssn STRING)
 RETURNS STRING
-RETURN CASE 
+RETURN CASE
   WHEN is_account_group_member('hr_admins') THEN ssn
   ELSE CONCAT('XXX-XX-', RIGHT(ssn, 4))
 END;
@@ -218,7 +218,7 @@ ALTER TABLE gold.employees ALTER COLUMN ssn SET MASK mask_ssn;
 -- 2. Row Filtering Function
 CREATE OR REPLACE FUNCTION filter_by_region(region STRING)
 RETURNS BOOLEAN
-RETURN is_account_group_member('executives') OR 
+RETURN is_account_group_member('executives') OR
        (is_account_group_member('emea_sales') AND region = 'EMEA');
 
 ALTER TABLE gold.sales SET ROW FILTER filter_by_region ON (region);
@@ -247,7 +247,7 @@ Queries run without code changes; unauthorized users automatically receive maske
 Databricks system tables expose audit logs, billing usage, and access telemetry as standard Delta tables under the `system` catalog:
 ```sql
 -- Track top 5 most expensive DLT pipelines over the last 30 days
-SELECT 
+SELECT
   usage_metadata.pipeline_id,
   SUM(usage_quantity) AS total_dbus,
   SUM(usage_quantity * 0.35) AS estimated_usd -- custom rate card

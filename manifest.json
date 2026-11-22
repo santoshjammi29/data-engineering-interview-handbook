@@ -3,8 +3,8 @@
   "github": "santoshjammi29/data-engineering-interview-handbook",
   "name": "Interview Handbook",
   "role": "Architectural defense playbook: 20 Knowledge Pillars, 10 125-series playbooks, 595+ production questions",
-  "last_synced": "2026-11-21T04:54:58.630342Z",
-  "entry_count": 32,
+  "last_synced": "2026-11-22T07:34:24.146599Z",
+  "entry_count": 33,
   "entries": [
     {
       "id": "data-engineering-interview-handbook-cs-spark_architecture_and_tuning_cheatsheet",
@@ -322,6 +322,16 @@
       "title": "125 Master Defense Playbook",
       "difficulty": "L300",
       "relative_path": "playbooks/125_master_defense_playbook.md",
+      "pillars": [
+        "All 14 Pillars"
+      ]
+    },
+    {
+      "id": "data-engineering-interview-handbook-curriculum-topics",
+      "type": "curriculum_topics_catalog",
+      "title": "Topics Directory: Interview Handbook",
+      "difficulty": "L200",
+      "relative_path": "topics/README.md",
       "pillars": [
         "All 14 Pillars"
       ]

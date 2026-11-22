@@ -119,12 +119,12 @@ Deploy an API Gateway (Kong / Envoy) or Kafka Schema Registry enforcing JSON Sch
 
 ```sql
 -- Monitor freshness lag in Delta Lake tables
-SELECT 
+SELECT
   table_name,
   max_event_timestamp,
   current_timestamp() AS check_time,
   TIMESTAMPDIFF(MINUTE, max_event_timestamp, current_timestamp()) AS latency_minutes,
-  CASE 
+  CASE
     WHEN TIMESTAMPDIFF(MINUTE, max_event_timestamp, current_timestamp()) > 30 THEN 'SLA_BREACH'
     ELSE 'HEALTHY'
   END AS sla_status
