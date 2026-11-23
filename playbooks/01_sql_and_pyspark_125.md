@@ -829,14 +829,14 @@ WHERE ts_2_txns_ago IS NOT NULL
 ```mermaid
 flowchart TD
     A["PySpark DataFrame Code"] --> B["Unresolved Logical Plan (AST)"]
-    B --> C["Catalog Lookup (Schema, Types, Tables)"]
+    B --> C["Catalog Lookup (Schema, Types,<br/>Tables)"]
     C --> D["Resolved Logical Plan"]
-    D --> E["Catalyst Optimizer (Rule-based: Predicate Pushdown, Constant Folding)"]
+    D --> E["Catalyst Optimizer (Rule-based:<br/>Predicate Pushdown, Constant<br/>Folding)"]
     E --> F["Optimized Logical Plan"]
-    F --> G["Physical Planning (Generates Multiple Physical Plans)"]
-    G --> H["Cost-Based Optimizer (CBO selects Best Physical Plan)"]
-    H --> I["Whole-Stage Code Generation (Janino compiles Java Bytecode)"]
-    I --> J["Execution DAG (Stages & Tasks submitted to Cluster)"]
+    F --> G["Physical Planning (Generates<br/>Multiple Physical Plans)"]
+    G --> H["Cost-Based Optimizer (CBO selects<br/>Best Physical Plan)"]
+    H --> I["Whole-Stage Code Generation<br/>(Janino compiles Java Bytecode)"]
+    I --> J["Execution DAG (Stages & Tasks<br/>submitted to Cluster)"]
 ```
 
 ---

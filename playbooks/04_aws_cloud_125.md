@@ -15,9 +15,9 @@
 flowchart LR
     A["Sources<br/>(IoT, CDC, APIs)"] -->|Kinesis Data Streams| B["Kinesis Firehose"]
     B -->|Micro-batch dump| C["Amazon S3<br/>(Raw Landing)"]
-    C -->|Crawlers / Catalog| D["AWS Glue Data Catalog"]
+    C -->|"Crawlers / Catalog"| D["AWS Glue Data Catalog"]
     D -->|Distributed PySpark| E["AWS Glue Jobs / EMR"]
-    E -->|Cleaned Parquet/Iceberg| F["Amazon S3<br/>(Curated Lake)"]
+    E -->|"Cleaned Parquet/Iceberg"| F["Amazon S3<br/>(Curated Lake)"]
     F -->|Query Engine| G["Amazon Athena / Redshift Spectrum"]
     G --> H["Amazon QuickSight / BI"]
 ```

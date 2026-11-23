@@ -136,7 +136,7 @@ Execute a 4-step Lakehouse compaction and pruning regime:
 **Incremental Pipeline Design (Auto Loader + Delta Merge):**
 ```mermaid
 flowchart LR
-    A["Raw S3/ADLS Gen2 Bucket"] -->|cloudFiles incremental discovery| B["Auto Loader (Bronze)"]
+    A["Raw S3/ADLS Gen2 Bucket"] -->|"cloudFiles incremental<br/>discovery"| B["Auto Loader (Bronze)"]
     B -->|readStream Change Data Feed| C["Silver Cleaning & De-duplication"]
     C -->|MERGE INTO| D["Gold Aggregations (SCD Type 2)"]
 ```
@@ -303,7 +303,7 @@ Design a Kimball dimensional model (Star Schema) on top of the Lakehouse Gold la
 flowchart LR
     A["Raw Sources<br/>(APIs, Kafka, DBs)"] -->|Auto Loader Append| B["Bronze Layer<br/>(Raw Delta Dump)"]
     B -->|Cleanse, Deduplicate, Validate| C["Silver Layer<br/>(Enriched Enterprise Data)"]
-    C -->|Aggregate & Model| D["Gold Layer<br/>(Star Schema & Features)"]
+    C -->|"Aggregate & Model"| D["Gold Layer<br/>(Star Schema & Features)"]
     D --> E["Power BI / ML / Analytics"]
 ```
 - **Bronze Layer (Raw History):** Ingestion zone. Data is appended in its rawest state with ingestion timestamps and filename metadata. Schema enforcement is minimal to prevent ingestion failure.
