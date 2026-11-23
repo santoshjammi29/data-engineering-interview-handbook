@@ -53,7 +53,6 @@ ls -la playbooks/
 
 ---
 
-
 ---
 
 ## 🎯 The 20 Technical Curriculum Pillars
@@ -83,7 +82,6 @@ ls -la playbooks/
 | **Σ** | **TOTAL** | **595** | **Complete Full-Stack Data Engineering & Lakehouse Architecture Mastery** | — |
 
 ---
-
 
 ---
 
@@ -167,7 +165,6 @@ The handbook incorporates publication-grade architectural whiteboard blueprints 
 
 ---
 
-
 ---
 
 ## 📚 Repository Structure
@@ -221,9 +218,7 @@ data-engineering-interview-handbook/
 
 ---
 
-
 ---
-
 
 ## 🧠 Core Curriculum Concepts & Topics (921 Topics Covered)
 
@@ -279,9 +274,7 @@ This handbook serves as the **Architectural Defense & Interview Playbook** withi
 | **R13** | **Spark Experiments** | [`spark-experiments`](https://github.com/santoshjammi29/spark-experiments) | Empirical skew & spill laboratory | • **Playbook 08 Defense**: 100 Spark Data Issues & Silent Corruptions backed by reproducible empirical benchmarks.<br>• **Physical Plan Verification**: Validating query execution DAGs under extreme data skew. |
 | **R14** | **Security Handbook** | [`security-handbook`](https://github.com/santoshjammi29/security-handbook) | Enterprise cloud security & governance | • **Pillars 17 & 18 Defense**: Zero Trust perimeter, workload identity federation, dynamic data masking, envelope encryption, and SOC2/ISO 27001 compliance.<br>• **Cloud Perimeter Incident Triage**: Defense playbooks for key rotation, credential leaks, and network isolation. |
 
-
 ---
-
 
 ---
 
