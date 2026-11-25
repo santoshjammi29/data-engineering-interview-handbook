@@ -28,7 +28,7 @@ Progress: [ ] 0 / 33 Completed (0.0%)
 <details>
 <summary>&nbsp;&nbsp;<b>🟡 Tier 2: Core Mechanics & Implementation (Level 200) (1 Drills)</b></summary>
 
-- [ ] `data-engineering-interview-handbook-cs-spark_architecture_and_tuning_cheatsheet` — [Cheat Sheet: Spark Architecture And Tuning Cheatsheet](cheatsheets/spark_architecture_and_tuning_cheatsheet.md) `L200`
+- [ ] `data-engineering-interview-handbook-cs-spark_architecture_and_tuning_cheatsheet` — [Cheat Sheet: Spark Architecture And Tuning Cheatsheet](../cheatsheets/spark_architecture_and_tuning_cheatsheet.md) `L200`
 
 </details>
 
@@ -93,7 +93,7 @@ Progress: [ ] 0 / 33 Completed (0.0%)
 <details>
 <summary>&nbsp;&nbsp;<b>🟡 Tier 2: Core Mechanics & Implementation (Level 200) (1 Drills)</b></summary>
 
-- [ ] `data-engineering-interview-handbook-curriculum-topics` — [Topics Directory: Interview Handbook](topics/README.md) `L200`
+- [ ] `data-engineering-interview-handbook-curriculum-topics` — [Topics Directory: Interview Handbook](../topics/README.md) `L200`
 
 </details>
 
